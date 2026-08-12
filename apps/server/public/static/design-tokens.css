@@ -1,0 +1,854 @@
+/*
+ * Enterprise design system
+ * ------------------------
+ * This file is the canonical visual source for the public site, authentication,
+ * merchant workspace and administration console. Legacy component styles keep
+ * their selectors, but consume the aliases defined here.
+ */
+
+:root {
+    color-scheme: light;
+
+    /* Brand and semantic colors */
+    --ds-nav: #101828;
+    --ds-nav-hover: #1d2939;
+    --ds-bg: #f4f6fa;
+    --ds-surface: #ffffff;
+    --ds-surface-2: #f8fafc;
+    --ds-text: #182230;
+    --ds-text-secondary: #5d6675;
+    --ds-text-weak: #87909f;
+    --ds-border: #e2e7ef;
+    --ds-border-strong: #cfd6e1;
+    --ds-primary: #3656d4;
+    --ds-primary-hover: #2846b8;
+    --ds-primary-soft: #eef2ff;
+    --ds-success: #2ba471;
+    --ds-success-soft: #e8f8f2;
+    --ds-warning: #d46b08;
+    --ds-warning-soft: #fff3e0;
+    --ds-danger: #d54941;
+    --ds-danger-soft: #fff0ed;
+    --ds-on-dark: #f5f7fb;
+    --ds-on-dark-muted: #aeb6c4;
+    --tooltip-bg: #1f2329;
+    --overlay-bg: rgba(17, 24, 39, .62);
+    --preview-stage-bg: #111722;
+    --canvas-stage-bg: #111722;
+    --diagnostic-bg: #111722;
+    --diagnostic-text: #eef3f8;
+
+    /* Type */
+    --ds-font-sans: Inter, "SF Pro Text", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei UI", sans-serif;
+    --ds-font-display: "SF Pro Display", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+    --ds-font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    --ds-weight-regular: 400;
+    --ds-weight-medium: 500;
+    --ds-weight-semibold: 600;
+    --ds-weight-number: 700;
+    --ds-text-xs: 12px;
+    --ds-text-sm: 13px;
+    --ds-text-md: 14px;
+    --ds-text-lg: 16px;
+    --ds-text-xl: 20px;
+    --ds-leading-tight: 1.3;
+    --ds-leading-normal: 1.55;
+    --ds-leading-relaxed: 1.7;
+
+    /* Layout */
+    --ds-space-1: 4px;
+    --ds-space-2: 8px;
+    --ds-space-3: 12px;
+    --ds-space-4: 16px;
+    --ds-space-5: 24px;
+    --ds-space-6: 32px;
+    --ds-space-7: 48px;
+    --ds-radius-control: 8px;
+    --ds-radius-card: 12px;
+    --ds-radius-dialog: 16px;
+    --ds-radius-pill: 999px;
+    --ds-shadow-sm: 0 1px 3px rgba(31, 35, 41, .07);
+    --ds-shadow-md: 0 10px 28px rgba(31, 35, 41, .1);
+    --ds-shadow-lg: 0 24px 64px rgba(11, 15, 23, .18);
+    --ds-focus: 0 0 0 3px rgba(54, 86, 212, .2);
+    --ds-motion-fast: 140ms;
+    --ds-motion-normal: 200ms;
+    --ds-z-header: 50;
+    --ds-z-popover: 70;
+    --ds-z-dialog: 100;
+
+    /* Legacy aliases: all four product surfaces resolve through this file. */
+    --page: var(--ds-bg);
+    --page-glow: var(--ds-bg);
+    --surface: var(--ds-surface);
+    --surface-raised: var(--ds-surface);
+    --surface-soft: var(--ds-surface-2);
+    --surface-inset: var(--ds-surface-2);
+    --surface-hover: var(--ds-primary-soft);
+    --sidebar: var(--ds-surface);
+    --sidebar-muted: var(--ds-text-secondary);
+    --text: var(--ds-text);
+    --muted: var(--ds-text-secondary);
+    --subtle: var(--ds-text-weak);
+    --border: var(--ds-border);
+    --divider: var(--ds-border);
+    --border-strong: var(--ds-border-strong);
+    --brand: var(--ds-primary);
+    --brand-dark: var(--ds-primary);
+    --brand-soft: var(--ds-primary-soft);
+    --accent: var(--ds-primary-hover);
+    --on-brand: #ffffff;
+    --brand-contrast: #ffffff;
+    --blue: var(--ds-primary-hover);
+    --green: var(--ds-success);
+    --green-soft: var(--ds-success-soft);
+    --success: var(--ds-success);
+    --success-soft: var(--ds-success-soft);
+    --amber: var(--ds-warning);
+    --amber-soft: var(--ds-warning-soft);
+    --warning: var(--ds-warning);
+    --warning-soft: var(--ds-warning-soft);
+    --red: var(--ds-danger);
+    --red-soft: var(--ds-danger-soft);
+    --danger: var(--ds-danger);
+    --danger-soft: var(--ds-danger-soft);
+    --info: var(--ds-primary);
+    --info-soft: var(--ds-primary-soft);
+    --focus: var(--ds-primary-hover);
+    --shadow: var(--ds-shadow-sm);
+    --shadow-sm: var(--ds-shadow-sm);
+    --shadow-md: var(--ds-shadow-md);
+    --shadow-lift: var(--ds-shadow-md);
+    --radius-control: var(--ds-radius-control);
+    --radius-surface: var(--ds-radius-card);
+
+    --landing-bg: var(--ds-bg);
+    --landing-bg-soft: var(--ds-surface-2);
+    --landing-panel: var(--ds-surface);
+    --landing-panel-strong: var(--ds-surface);
+    --landing-line: var(--ds-border);
+    --landing-line-strong: var(--ds-border-strong);
+    --landing-text: var(--ds-text);
+    --landing-muted: var(--ds-text-secondary);
+    --landing-subtle: var(--ds-text-weak);
+    --landing-accent: var(--ds-primary);
+    --landing-accent-strong: var(--ds-primary);
+    --landing-accent-ink: #ffffff;
+    --landing-cyan: var(--ds-primary-hover);
+    --landing-danger: var(--ds-danger);
+    --landing-success: var(--ds-success);
+    --landing-shadow: var(--ds-shadow-lg);
+
+    --admin-teal: var(--ds-primary);
+    --admin-teal-dark: var(--ds-primary);
+    --admin-shell-bg: var(--ds-bg);
+    --admin-shell-panel: var(--ds-surface);
+    --admin-shell-border: var(--ds-border);
+    --admin-shell-text: var(--ds-text);
+    --admin-shell-muted: var(--ds-text-secondary);
+}
+
+html,
+body,
+button,
+input,
+select,
+textarea {
+    font-family: var(--ds-font-sans);
+}
+
+body {
+    background: var(--ds-bg);
+    color: var(--ds-text);
+    font-weight: var(--ds-weight-regular);
+}
+
+:where(h1, h2, h3, .admin-topnav-brand strong, .merchant-sidebar-brand strong) {
+    font-family: var(--ds-font-display);
+    letter-spacing: -.012em;
+}
+
+:where(button, input, select, textarea, a, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--ds-primary);
+    outline-offset: 2px;
+    box-shadow: var(--ds-focus);
+}
+
+:where(.button, .landing-button, .icon-button, input, select, textarea) {
+    border-radius: var(--ds-radius-control);
+}
+
+:where(.panel, .stat, .card, .plan-card, .asset-group, .workspace-task-card) {
+    border-color: var(--ds-border);
+    border-radius: var(--ds-radius-card);
+    background: var(--ds-surface);
+    box-shadow: var(--ds-shadow-sm);
+}
+
+.button.primary,
+button.primary {
+    border-color: var(--ds-primary);
+    background: var(--ds-primary);
+    color: #ffffff;
+    box-shadow: none;
+}
+
+.button.primary:hover,
+button.primary:hover {
+    border-color: var(--ds-primary-hover);
+    background: var(--ds-primary-hover);
+}
+
+.brand-mark {
+    display: grid;
+    place-items: center;
+    padding: 0;
+    background: var(--ds-primary);
+    box-shadow: none;
+    line-height: 1;
+    text-align: center;
+}
+
+/* Public website */
+.landing-body {
+    background: var(--ds-bg);
+    color: var(--ds-text);
+    font-family: var(--ds-font-sans);
+    font-size: var(--ds-text-md);
+    line-height: var(--ds-leading-relaxed);
+}
+
+.landing-body::before {
+    display: none;
+}
+
+.landing-header {
+    border-color: var(--ds-border);
+    background: rgba(255, 255, 255, .98);
+    box-shadow: 0 1px 4px rgba(31, 35, 41, .04);
+    backdrop-filter: none;
+}
+
+.landing-header .landing-brand {
+    color: var(--ds-text);
+}
+
+.landing-header .landing-brand small,
+.landing-header .landing-nav a,
+.landing-header .landing-button.text {
+    color: var(--ds-text-secondary);
+}
+
+.landing-header .landing-nav a:hover,
+.landing-header .landing-nav a:focus-visible,
+.landing-header .landing-button.text:hover {
+    color: var(--ds-primary);
+}
+
+.landing-brand-mark {
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: var(--ds-radius-control);
+    background: var(--ds-primary);
+    box-shadow: none;
+    font-weight: var(--ds-weight-number);
+    line-height: 1;
+    text-align: center;
+}
+
+.landing-nav a,
+.landing-button {
+    font-weight: var(--ds-weight-semibold);
+}
+
+.landing-nav a::after {
+    background: var(--ds-primary-hover);
+}
+
+.landing-mobile-menu > summary {
+    border-color: var(--ds-border-strong);
+    background: var(--ds-surface);
+    color: var(--ds-text-secondary);
+}
+
+.landing-button.primary {
+    border-color: var(--ds-primary);
+    background: var(--ds-primary);
+    color: #ffffff;
+    box-shadow: none;
+}
+
+.landing-button.primary:hover {
+    border-color: var(--ds-primary-hover);
+    background: var(--ds-primary-hover);
+}
+
+.landing-button.secondary {
+    border-color: var(--ds-border-strong);
+    background: var(--ds-surface);
+    color: var(--ds-text);
+}
+
+.landing-mobile-menu > div {
+    border-color: var(--ds-border);
+    background: var(--ds-surface);
+    box-shadow: var(--ds-shadow-lg);
+}
+
+.landing-mobile-menu nav a,
+.landing-mobile-menu > div > div > a,
+.landing-mobile-menu > div > div > button {
+    color: var(--ds-text-secondary);
+}
+
+.landing-hero {
+    background: var(--ds-bg);
+}
+
+.landing-kicker {
+    border-color: #cfe0ff;
+    background: var(--ds-primary-soft);
+    color: var(--ds-primary);
+    font-weight: var(--ds-weight-semibold);
+}
+
+.landing-hero-copy h1,
+.landing-section-heading h1,
+.landing-section-heading h2,
+.landing-cta h2 {
+    color: var(--ds-text);
+    font-weight: var(--ds-weight-number);
+}
+
+.landing-hero-copy > p,
+.landing-section-heading p,
+.landing-workflow-list small,
+.landing-proof p,
+.landing-plan-card p {
+    color: var(--ds-text-secondary);
+}
+
+.landing-hero-points svg {
+    color: var(--ds-primary);
+}
+
+.landing-create-console {
+    border-color: var(--ds-border-strong);
+    border-radius: var(--ds-radius-dialog);
+    background: var(--ds-surface);
+    box-shadow: var(--ds-shadow-md);
+}
+
+.landing-create-console::before {
+    display: none;
+}
+
+.landing-console-status {
+    color: var(--ds-primary);
+    font-weight: var(--ds-weight-semibold);
+}
+
+.landing-console-status i {
+    background: var(--ds-primary);
+    box-shadow: 0 0 0 4px rgba(0, 82, 217, .1);
+}
+
+.landing-reference-zone > label {
+    border-color: var(--ds-border-strong);
+    border-radius: var(--ds-radius-card);
+    background: var(--ds-surface-2);
+}
+
+.landing-reference-zone > label > i,
+.landing-reference-zone > label > svg {
+    color: var(--ds-primary);
+    background: var(--ds-primary-soft);
+}
+
+.landing-prompt-field > label,
+.landing-prompt-field > div button {
+    font-weight: var(--ds-weight-semibold);
+}
+
+.landing-prompt-field textarea,
+.landing-create-settings label {
+    border-color: var(--ds-border);
+    border-radius: var(--ds-radius-control);
+    background: var(--ds-surface);
+    color: var(--ds-text);
+}
+
+.landing-prompt-field textarea:focus {
+    border-color: var(--ds-primary);
+    box-shadow: var(--ds-focus);
+}
+
+.landing-prompt-field > div button {
+    border-color: var(--ds-border-strong);
+    background: var(--ds-surface);
+    color: var(--ds-primary);
+}
+
+.landing-workflow,
+.landing-pricing,
+.landing-releases-page,
+.landing-release-band {
+    border-color: var(--ds-border);
+    background: var(--ds-bg);
+}
+
+.landing-workflow-list li,
+.landing-proof article,
+.landing-plan-card,
+.landing-release-list article,
+.landing-release-page-list > article,
+.landing-empty-state {
+    border-color: var(--ds-border);
+    border-radius: var(--ds-radius-card);
+    background: var(--ds-surface);
+    box-shadow: var(--ds-shadow-sm);
+}
+
+.landing-workflow-list li > b,
+.landing-proof article > svg,
+.landing-proof article > i {
+    color: var(--ds-primary);
+    background: var(--ds-primary-soft);
+}
+
+.landing-release-band > div {
+    border-color: var(--ds-border);
+    border-radius: var(--ds-radius-dialog);
+    background: var(--ds-surface);
+}
+
+.landing-release-drawer {
+    border-color: var(--ds-border);
+    border-radius: var(--ds-radius-dialog) 0 0 var(--ds-radius-dialog);
+    background: var(--ds-surface);
+    color: var(--ds-text);
+}
+
+.landing-release-drawer::backdrop {
+    background: rgba(11, 15, 23, .66);
+}
+
+.landing-release-drawer-header,
+.landing-release-drawer-footer {
+    border-color: var(--ds-border);
+    background: var(--ds-surface);
+}
+
+.landing-release-filters button[aria-pressed="true"],
+.landing-release-page-filters a.active {
+    border-color: var(--ds-primary);
+    background: var(--ds-primary-soft);
+    color: var(--ds-primary);
+}
+
+.landing-cta {
+    border-color: var(--ds-border);
+    background: var(--ds-primary-soft);
+}
+
+.landing-footer {
+    border-color: #222a37;
+    background: var(--ds-nav);
+    color: var(--ds-on-dark);
+}
+
+.landing-footer .landing-brand {
+    color: var(--ds-on-dark);
+}
+
+.landing-footer .landing-brand small,
+.landing-footer-intro p,
+.landing-footer-grid > div > a,
+.landing-footer-bottom,
+.landing-footer-bottom a {
+    color: var(--ds-on-dark-muted);
+}
+
+.landing-footer-bottom {
+    border-color: #283140;
+}
+
+/* Authentication */
+.auth-page,
+.login-auth-page {
+    min-height: 100dvh;
+    display: grid;
+    grid-template: 64px minmax(0, 1fr) / minmax(0, 1fr);
+    background: var(--ds-bg);
+}
+
+.auth-page .auth-brand,
+.login-auth-page .auth-brand {
+    min-height: 64px;
+    grid-row: 1;
+    grid-column: 1;
+    padding: 0 clamp(18px, 4vw, 48px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-bottom: 1px solid var(--ds-border);
+    background: var(--ds-surface);
+}
+
+.auth-page .auth-brand > *,
+.login-auth-page .auth-brand > * {
+    width: auto;
+}
+
+.auth-page .auth-brand .brand-lockup,
+.login-auth-page .auth-brand .brand-lockup {
+    min-height: 0;
+}
+
+.auth-page .auth-brand .brand-lockup strong,
+.login-auth-page .auth-brand .brand-lockup strong {
+    color: var(--ds-text);
+}
+
+.auth-page .auth-brand .brand-lockup small,
+.login-auth-page .auth-brand .brand-lockup small {
+    color: var(--ds-text-secondary);
+}
+
+.auth-page .auth-signal,
+.auth-page .auth-meta,
+.auth-page .auth-feature-list,
+.auth-page .auth-console-preview {
+    display: none;
+}
+
+.auth-page .auth-main,
+.login-auth-page .auth-main {
+    min-height: 0;
+    grid-row: 2;
+    grid-column: 1;
+    padding: clamp(40px, 8vh, 84px) 20px;
+    display: grid;
+    place-items: start center;
+    background: var(--ds-bg);
+}
+
+.auth-page .auth-card {
+    width: min(440px, 100%);
+    padding: 32px;
+    border: 1px solid var(--ds-border);
+    border-radius: var(--ds-radius-card);
+    background: var(--ds-surface);
+    box-shadow: var(--ds-shadow-md);
+}
+
+.auth-card .eyebrow {
+    color: var(--ds-primary);
+    font-weight: var(--ds-weight-semibold);
+}
+
+.auth-card h2 {
+    color: var(--ds-text);
+    font-weight: var(--ds-weight-semibold);
+}
+
+.auth-card-brand {
+    display: none;
+}
+
+.geetest-field:has([data-geetest-status]:empty) {
+    display: none;
+}
+
+.geetest-field [data-geetest-status] {
+    color: var(--ds-text-secondary);
+}
+
+.geetest-field [data-geetest-status].error {
+    color: var(--ds-danger);
+}
+
+/* Merchant workspace */
+.merchant-studio-body {
+    --studio-canvas: var(--ds-bg);
+    --studio-sidebar: var(--ds-surface);
+    --studio-line: var(--ds-border);
+    --studio-brand: var(--ds-primary);
+    --studio-brand-hover: var(--ds-primary-hover);
+    --studio-brand-soft: var(--ds-primary-soft);
+    background: var(--ds-bg);
+}
+
+.merchant-project-sidebar {
+    border-color: var(--ds-border);
+    background: var(--ds-surface);
+}
+
+.merchant-sidebar-brand .brand-mark,
+.studio-new-menu > summary {
+    border-radius: var(--ds-radius-control);
+    background: var(--ds-primary);
+}
+
+.merchant-sidebar-brand strong,
+.studio-new-popover strong,
+.merchant-mode-nav a.active,
+.merchant-recent-projects > header strong,
+.merchant-topbar-project strong,
+.merchant-task-button > span,
+.free-prompt-source-note a,
+.free-project-results footer a {
+    font-weight: var(--ds-weight-semibold);
+}
+
+.merchant-mode-nav a,
+.merchant-project-row,
+.merchant-sidebar-account a {
+    border-radius: var(--ds-radius-control);
+}
+
+.merchant-mode-nav a.active {
+    color: var(--ds-primary);
+    background: var(--ds-primary-soft);
+}
+
+.merchant-studio-topbar {
+    border-color: var(--ds-border);
+    background: var(--ds-surface);
+    color: var(--ds-text);
+    box-shadow: 0 1px 4px rgba(31, 35, 41, .04);
+}
+
+.merchant-studio-topbar .merchant-topbar-project strong,
+.merchant-studio-topbar .merchant-task-button > span,
+.merchant-studio-topbar .user-menu {
+    color: var(--ds-text);
+}
+
+.merchant-studio-topbar .merchant-topbar-project small,
+.merchant-studio-topbar .icon-button {
+    color: var(--ds-text-secondary);
+}
+
+.merchant-studio-topbar .icon-button,
+.merchant-studio-topbar .merchant-topbar-credit {
+    border-color: var(--ds-border-strong);
+    background: var(--ds-surface);
+}
+
+.merchant-studio-topbar .merchant-topbar-credit small,
+.merchant-studio-topbar .merchant-topbar-credit strong {
+    color: var(--ds-text);
+}
+
+.merchant-studio-main {
+    background: var(--ds-bg);
+}
+
+.studio-new-popover,
+.workspace-account-popover,
+.workspace-task-drawer,
+.studio-side-drawer,
+.workspace-project-dialog,
+.free-studio-inspiration-popover,
+.free-studio-template-more > div {
+    border-color: var(--ds-border);
+    border-radius: var(--ds-radius-card);
+    background: var(--ds-surface);
+    box-shadow: var(--ds-shadow-lg);
+}
+
+.product-launch-stage-icon,
+.free-studio-stage-icon {
+    color: var(--ds-primary);
+    background: var(--ds-primary-soft);
+}
+
+.product-launch-composer,
+.free-studio-composer,
+.free-chat-bubble,
+.free-project-results article {
+    border-color: var(--ds-border-strong);
+    border-radius: var(--ds-radius-card);
+    background: var(--ds-surface);
+    box-shadow: var(--ds-shadow-md);
+}
+
+.product-launch-composer button.product-launch-composer-submit,
+.free-studio-composer button.free-studio-submit {
+    border-color: var(--ds-primary);
+    border-radius: var(--ds-radius-control);
+    background: var(--ds-primary);
+    box-shadow: none;
+}
+
+.free-chat-avatar {
+    border-radius: var(--ds-radius-control);
+    background: var(--ds-primary);
+}
+
+.free-chat-progress > span i,
+.workspace-task-progress i,
+.product-launch-progress-track span {
+    background: var(--ds-primary);
+}
+
+/* Administration console */
+.admin-shell-body {
+    background: var(--ds-bg);
+}
+
+.admin-topnav {
+    border-color: var(--ds-border);
+    background: var(--ds-surface);
+    color: var(--ds-text);
+    box-shadow: 0 1px 4px rgba(31, 35, 41, .04);
+    backdrop-filter: none;
+}
+
+.admin-topnav-brand {
+    color: var(--ds-text);
+}
+
+.admin-topnav-brand .brand-mark {
+    border-radius: var(--ds-radius-control);
+    background: var(--ds-primary);
+    box-shadow: none;
+}
+
+.admin-topnav-brand small,
+.admin-nav-group > summary,
+.admin-command-search,
+.admin-topbar-actions .icon-button,
+.admin-account-menu > summary {
+    color: var(--ds-text-secondary);
+}
+
+.admin-nav-group > summary {
+    border-radius: var(--ds-radius-control);
+    font-weight: var(--ds-weight-semibold);
+}
+
+.admin-nav-group.active > summary,
+.admin-nav-group[open] > summary,
+.admin-nav-group > summary:hover {
+    color: var(--ds-primary);
+    background: var(--ds-primary-soft);
+}
+
+.admin-command-search,
+.admin-topbar-actions .icon-button,
+.admin-account-menu > summary,
+.admin-mobile-menu {
+    border-color: var(--ds-border-strong);
+    background: var(--ds-surface);
+}
+
+.admin-command-search input,
+.admin-account-identity strong {
+    color: var(--ds-text);
+}
+
+.admin-nav-popover,
+.admin-account-popover,
+.admin-mobile-drawer,
+.admin-side-drawer-shell,
+.admin-dialog-shell {
+    border-color: var(--ds-border);
+    border-radius: var(--ds-radius-card);
+    background: var(--ds-surface);
+    color: var(--ds-text);
+    box-shadow: var(--ds-shadow-lg);
+}
+
+.admin-nav-popover a.active,
+.admin-nav-popover a:hover,
+.admin-mobile-navigation a.active,
+.admin-mobile-navigation a:hover {
+    color: var(--ds-primary);
+    background: var(--ds-primary-soft);
+}
+
+.admin-contextbar {
+    border-color: var(--ds-border);
+    background: var(--ds-surface);
+}
+
+.admin-shell-main,
+.admin-shell-content {
+    background: var(--ds-bg);
+}
+
+.admin-shell :where(.panel, .stat, .creative-product-card, .prompt-main-card, .ai-capability-card, .ai-function-master, .ai-function-detail) {
+    border-color: var(--ds-border);
+    border-radius: var(--ds-radius-card);
+    background: var(--ds-surface);
+    box-shadow: var(--ds-shadow-sm);
+}
+
+.admin-shell :where(.button.primary, button.primary) {
+    border-color: var(--ds-primary);
+    background: var(--ds-primary);
+}
+
+.admin-shell :where(.badge.active, .status-badge.active) {
+    color: var(--ds-primary);
+    background: var(--ds-primary-soft);
+}
+
+.prompt-context-tabs a.active,
+.prompt-context-tabs a:hover {
+    color: var(--ds-primary);
+    background: var(--ds-primary-soft);
+}
+
+.data-table th {
+    background: var(--ds-surface-2);
+    color: var(--ds-text-secondary);
+}
+
+.data-table td,
+.data-table th {
+    border-color: var(--ds-border);
+}
+
+@media (max-width: 720px) {
+    .landing-container {
+        padding-inline: 16px;
+    }
+
+    .landing-hero {
+        padding-top: 42px;
+    }
+
+    .landing-create-console {
+        border-radius: var(--ds-radius-card);
+    }
+
+    .auth-page .auth-main,
+    .login-auth-page .auth-main {
+        padding: 28px 14px;
+    }
+
+    .auth-page .auth-card {
+        padding: 24px 20px;
+    }
+
+    .landing-release-drawer {
+        border-radius: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+}

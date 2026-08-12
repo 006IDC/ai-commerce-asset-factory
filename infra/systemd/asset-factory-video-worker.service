@@ -1,0 +1,20 @@
+[Unit]
+Description=AI Asset Factory asynchronous video worker
+After=network-online.target mariadb.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=www
+Group=www
+WorkingDirectory=/opt/asset-factory/apps/server
+ExecStart=/usr/bin/php think jobs:work-video
+Restart=always
+RestartSec=3
+KillSignal=SIGTERM
+TimeoutStopSec=30
+StandardOutput=append:/opt/asset-factory/apps/server/runtime/log/video-worker.log
+StandardError=append:/opt/asset-factory/apps/server/runtime/log/video-worker-error.log
+
+[Install]
+WantedBy=multi-user.target

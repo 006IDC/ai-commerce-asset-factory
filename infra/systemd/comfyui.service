@@ -1,0 +1,35 @@
+[Unit]
+Description=Asset Factory ComfyUI Workflow Engine
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=comfyui
+Group=comfyui
+WorkingDirectory=/opt/comfyui
+Environment=PYTHONUNBUFFERED=1
+EnvironmentFile=-/etc/asset-factory/comfyui.env
+Environment=ASSET_FACTORY_SUB2API_STATE_DIR=/var/lib/asset-factory/comfyui/provider-state
+LoadCredential=sub2api.env:/etc/asset-factory/sub2api/asset-factory-comfyui-production.env
+ExecStart=/opt/comfyui/.venv/bin/python /opt/comfyui/main.py --cpu --listen 127.0.0.1 --port 8188 --disable-auto-launch
+Restart=always
+RestartSec=5
+TimeoutStopSec=30
+KillSignal=SIGINT
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/opt/comfyui/input /opt/comfyui/output /opt/comfyui/temp /opt/comfyui/user /var/lib/asset-factory/comfyui
+MemoryMax=6G
+TasksMax=512
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,15 @@
+Options -Indexes
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteRule (^|/)\. - [F,L]
+    RewriteRule ^(?:app|config|database|extend|route|runtime|vendor|view|scripts|tests)(?:/|$) - [F,L,NC]
+    RewriteRule ^(?:composer\.(?:json|lock)|think|README(?:_INSTALL)?\.md|\.example\.env)$ - [F,L,NC]
+
+    RewriteRule ^(static|storage)/(.*)$ public/$1/$2 [L]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ public/index.php [QSA,L]
+</IfModule>

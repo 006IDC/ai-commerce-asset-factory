@@ -1,0 +1,22 @@
+[Unit]
+Description=AI Asset Factory verified production backup
+After=postgresql.service
+ConditionPathExists=/opt/asset-factory/apps/server/.env
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+UMask=0077
+Environment=ASSET_FACTORY_BACKUP_ROOT=/root/asset-factory-backups
+ExecStart=/usr/bin/php /opt/asset-factory/apps/server/scripts/backup-production.php --app-root=/opt/asset-factory/apps/server
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=read-only
+ProtectSystem=strict
+ReadWritePaths=/root/asset-factory-backups
+MemoryMax=1G
+CPUQuota=50%

@@ -1,0 +1,351 @@
+.one-flow-workbench {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 28px clamp(18px, 3vw, 42px) 72px;
+    scroll-behavior: smooth;
+}
+.one-flow-workbench :is(#product-identity, #product-report, #delivery-targets, #creation-use) {
+    scroll-margin-top: 96px;
+}
+.one-flow-hero {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 30px;
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    background: linear-gradient(135deg, #fff 0%, var(--ds-primary-soft) 155%);
+    box-shadow: var(--ds-shadow-sm);
+}
+.one-flow-hero .eyebrow,
+.section-kicker {
+    display: block;
+    margin-top: 16px;
+    color: var(--ds-primary);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .13em;
+}
+.one-flow-hero h1 {
+    margin: 7px 0;
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1.06;
+}
+.one-flow-hero p,
+.one-flow-section > header p {
+    margin: 0;
+    color: var(--muted);
+}
+.one-flow-hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.one-flow-anchor-nav {
+    position: sticky;
+    top: 0;
+    z-index: 12;
+    display: flex;
+    gap: 6px;
+    margin: 18px 0;
+    padding: 7px;
+    overflow: auto;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .94);
+    box-shadow: var(--ds-shadow-sm);
+    backdrop-filter: blur(14px);
+}
+.one-flow-anchor-nav a {
+    padding: 9px 12px;
+    border-radius: 9px;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.one-flow-anchor-nav a:hover {
+    color: var(--ds-primary);
+    background: var(--ds-primary-soft);
+}
+.one-flow-readiness {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+}
+.readiness-card {
+    display: flex;
+    gap: 12px;
+    min-height: 132px;
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface);
+    box-shadow: var(--ds-shadow-sm);
+}
+.readiness-card > span {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    flex: none;
+    place-items: center;
+    border-radius: 11px;
+    color: var(--warning);
+    background: var(--warning-soft);
+}
+.readiness-card.is-ready > span {
+    color: var(--success);
+    background: var(--success-soft);
+}
+.readiness-card small,
+.readiness-card strong {
+    display: block;
+}
+.readiness-card small {
+    color: var(--subtle);
+}
+.readiness-card strong {
+    margin: 3px 0 7px;
+    font-size: 16px;
+}
+.readiness-card p,
+.readiness-card em {
+    margin: 0;
+    color: var(--muted);
+    font-size: 12px;
+    font-style: normal;
+    line-height: 1.55;
+}
+.readiness-card em {
+    display: block;
+    margin-top: 7px;
+    color: var(--warning);
+}
+.one-flow-section {
+    margin-top: 20px;
+    padding: 26px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface);
+    box-shadow: var(--ds-shadow-sm);
+}
+.one-flow-section > header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+.one-flow-section h2 {
+    margin: 4px 0 5px;
+    font-size: 24px;
+}
+.one-flow-identity-grid {
+    display: grid;
+    grid-template-columns: minmax(260px, .7fr) minmax(420px, 1.55fr);
+    gap: 18px;
+}
+.one-flow-reference-card {
+    position: relative;
+    min-height: 390px;
+    overflow: hidden;
+    border-radius: 16px;
+    background: var(--surface-soft);
+}
+.one-flow-reference-card > img {
+    width: 100%;
+    height: 390px;
+    object-fit: contain;
+}
+.one-flow-reference-card > span {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    color: #fff;
+    background: rgba(16, 24, 40, .84);
+    font-size: 12px;
+}
+.one-flow-reference-thumbs {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    display: flex;
+    gap: 8px;
+}
+.one-flow-reference-thumbs img {
+    width: 56px;
+    height: 56px;
+    border: 2px solid #fff;
+    border-radius: 9px;
+    background: #fff;
+    object-fit: cover;
+}
+.one-flow-basic-form {
+    margin: 0;
+    padding: 18px;
+}
+.product-report-form {
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface-soft);
+}
+.delivery-target-form {
+    display: grid;
+    gap: 14px;
+}
+.delivery-target-row {
+    display: grid;
+    grid-template-columns: 120px 1fr 1fr 38px;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 8px;
+}
+.delivery-target-row > span {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 750;
+}
+.creation-use-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+.creation-use-card {
+    position: relative;
+    padding: 22px;
+    border: 1px solid var(--border);
+    border-radius: 17px;
+    background: var(--surface);
+}
+.creation-use-card.is-recommended {
+    border-color: var(--ds-primary);
+    box-shadow: 0 14px 34px rgba(54, 86, 212, .13);
+}
+.creation-use-card.is-disabled {
+    background: var(--surface-soft);
+}
+.creation-use-card > i {
+    width: 30px;
+    height: 30px;
+    color: var(--ds-primary);
+}
+.creation-use-card h3 {
+    margin: 14px 0 7px;
+}
+.creation-use-card > p {
+    min-height: 42px;
+    color: var(--muted);
+}
+.recommended-ribbon {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    color: var(--ds-primary);
+    background: var(--ds-primary-soft);
+    font-size: 11px;
+    font-weight: 800;
+}
+.creation-use-card dl {
+    display: grid;
+    gap: 7px;
+    margin: 16px 0;
+}
+.creation-use-card dl > div {
+    display: flex;
+    justify-content: space-between;
+}
+.creation-use-card dt {
+    color: var(--muted);
+}
+.creation-use-card dd {
+    margin: 0;
+    font-weight: 750;
+}
+.creation-use-card.is-disabled .button {
+    white-space: normal;
+    text-align: center;
+}
+.existing-plan-list {
+    margin-top: 20px;
+}
+.existing-plan-list > a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    border-top: 1px solid var(--border);
+}
+.existing-plan-list a span :is(strong, small) {
+    display: block;
+}
+.existing-plan-list a small {
+    margin-top: 3px;
+    color: var(--muted);
+}
+.generation-delivery-callout,
+.selected-context-chip {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    background: var(--ds-primary-soft);
+}
+.generation-delivery-callout > i,
+.selected-context-chip > i {
+    color: var(--ds-primary);
+    flex: none;
+}
+.generation-delivery-callout span :is(strong, small),
+.selected-context-chip span :is(strong, small) {
+    display: block;
+}
+.generation-delivery-callout small,
+.selected-context-chip small {
+    margin-top: 3px;
+    color: var(--muted);
+}
+.selected-context-chip > a {
+    margin-left: auto;
+    font-size: 12px;
+    font-weight: 700;
+}
+.experience-stepper .needs-work {
+    border-color: var(--warning);
+    color: var(--warning);
+    background: var(--warning-soft);
+}
+@media (max-width: 1100px) {
+    .one-flow-readiness { grid-template-columns: repeat(2, 1fr); }
+    .one-flow-identity-grid { grid-template-columns: 1fr; }
+    .one-flow-reference-card { min-height: 300px; }
+    .one-flow-reference-card > img { height: 300px; }
+    .creation-use-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 680px) {
+    .one-flow-workbench { padding: 14px 12px 54px; }
+    .one-flow-hero { align-items: flex-start; flex-direction: column; padding: 20px; }
+    .one-flow-hero-actions { display: grid; width: 100%; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .one-flow-hero-actions > .badge { grid-column: 1 / -1; justify-self: start; }
+    .one-flow-hero-actions .button { min-width: 0; justify-content: center; white-space: nowrap; }
+    .one-flow-readiness { grid-template-columns: 1fr; }
+    .readiness-card { min-height: 0; }
+    .one-flow-section { padding: 18px; }
+    .one-flow-section > header { flex-direction: column; }
+    .one-flow-identity-grid { grid-template-columns: minmax(0, 1fr); }
+    .delivery-target-row { grid-template-columns: 1fr 38px; }
+    .delivery-target-row > span { grid-column: 1 / -1; }
+    .delivery-target-row select { grid-column: 1 / 2; }
+    .delivery-target-row button { grid-column: 2; grid-row: 2 / 4; }
+}

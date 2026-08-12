@@ -1,0 +1,27 @@
+[Unit]
+Description=AI media provider protocol bridge (loopback only)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ark-bridge
+Group=ark-bridge
+WorkingDirectory=/opt/ark-bridge
+EnvironmentFile=/etc/ark-bridge.env
+ExecStart=/opt/ark-bridge/venv/bin/python /opt/ark-bridge/app.py
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+ReadWritePaths=/opt/ark-bridge
+
+[Install]
+WantedBy=multi-user.target

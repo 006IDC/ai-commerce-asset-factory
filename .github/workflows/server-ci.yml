@@ -1,0 +1,117 @@
+name: Server CI
+
+on:
+  push:
+    paths:
+      - 'apps/server/**'
+      - 'services/**'
+      - 'infra/**'
+      - '.github/workflows/server-ci.yml'
+  pull_request:
+    paths:
+      - 'apps/server/**'
+      - 'services/**'
+      - 'infra/**'
+      - '.github/workflows/server-ci.yml'
+  workflow_dispatch:
+
+jobs:
+  python-services:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: services/ark-bridge/requirements.txt
+
+      - name: Install system test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y fonts-noto-cjk
+
+      - name: Install service test dependencies
+        run: |
+          python -m pip install -r services/ark-bridge/requirements.txt
+          python -m pip install Pillow==12.2.0
+
+      - name: Run Ark Bridge tests
+        working-directory: services/ark-bridge
+        run: python -m unittest test_app.py
+
+      - name: Run ComfyUI node tests
+        working-directory: services/comfyui-asset-factory-nodes
+        run: python -m unittest test_asset_factory_nodes.py
+
+  server:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/server
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: curl, gd, mbstring, pdo_sqlite, sqlite3, xml, zip
+          coverage: none
+
+      - name: Validate and install dependencies
+        run: |
+          composer validate --strict
+          composer install --no-interaction --prefer-dist
+          composer audit --locked --no-dev
+
+      - name: Prepare isolated application database
+        run: |
+          cp .example.env .env
+          app_key="$(php -r "echo 'base64:'.base64_encode(random_bytes(32));")"
+          sed -i "s|^APP_KEY =.*|APP_KEY = ${app_key}|" .env
+          sed -i 's|^ADMIN_INITIAL_PASSWORD =.*|ADMIN_INITIAL_PASSWORD = ExampleOnly!2026|' .env
+          php think app:install
+          php think app:upgrade
+          ASSET_FACTORY_ALLOW_TEST_FIXTURE=1 php tests/create_public_test_fixture.php
+
+      - name: Check PHP and JavaScript syntax
+        run: |
+          find app config route tests view scripts -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+          find public/static -maxdepth 1 -type f -name '*.js' -print0 | xargs -0 -n1 node --check
+
+      - name: Verify installed application HTTP entry
+        run: |
+          php -d upload_max_filesize=32M -d post_max_size=160M -S 127.0.0.1:8088 -t public public/router.php >/tmp/asset-factory-ci-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "${server_pid}"' EXIT
+          for attempt in $(seq 1 50); do
+            curl -fsS http://127.0.0.1:8088/login >/dev/null && break
+            sleep 0.1
+          done
+          curl -fsS http://127.0.0.1:8088/api/health >/dev/null
+
+      - name: Run contract suite with reliable failure detection
+        run: php tests/run-contracts.php
+
+      - name: Build production-only release package
+        run: |
+          release_id="ci-${GITHUB_SHA:0:12}"
+          source_epoch="$(git log -1 --format=%ct)"
+          SOURCE_REVISION="$GITHUB_SHA" SOURCE_DATE_EPOCH="$source_epoch" bash scripts/build-release.sh "$release_id"
+          unzip -tq "dist/asset-factory-thinkphp-${release_id}.zip"
+
+      - name: Verify fresh installation from release package
+        run: |
+          release_id="ci-${GITHUB_SHA:0:12}"
+          package_root="$(mktemp -d)"
+          unzip -q "dist/asset-factory-thinkphp-${release_id}.zip" -d "$package_root"
+          php -d upload_max_filesize=32M -d post_max_size=160M -S 127.0.0.1:8089 -t "$package_root/public" "$package_root/public/router.php" >/tmp/asset-factory-install-ci.log 2>&1 &
+          server_pid=$!
+          trap 'kill "${server_pid}"' EXIT
+          for attempt in $(seq 1 50); do
+            curl -fsS http://127.0.0.1:8089/install >/dev/null && break
+            sleep 0.1
+          done
+          php tests/install_smoke.php http://127.0.0.1:8089 "$package_root"

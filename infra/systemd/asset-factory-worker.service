@@ -1,0 +1,21 @@
+[Unit]
+Description=AI Commerce Asset Factory Generation Worker
+After=network-online.target postgresql.service redis-server.service php8.3-fpm.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/asset-factory/apps/server
+ExecStart=/usr/bin/php think jobs:work
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/opt/asset-factory/apps/server/runtime /opt/asset-factory/apps/server/public/storage
+
+[Install]
+WantedBy=multi-user.target

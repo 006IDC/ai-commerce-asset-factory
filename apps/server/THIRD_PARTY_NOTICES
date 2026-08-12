@@ -1,0 +1,8 @@
+AI Commerce Asset Factory - Third-Party Notices
+================================================
+
+The application interoperates with Sub2API and ComfyUI as independently
+deployed services. Their server source and credentials are not bundled.
+
+Bundled browser libraries and PHP dependencies retain their upstream license
+files and metadata. See ../../THIRD_PARTY_NOTICES.md and composer.lock.

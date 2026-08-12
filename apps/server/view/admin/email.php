@@ -1,0 +1,15 @@
+<?php require __DIR__ . '/../partials/admin_header.php'; ?>
+<div class="page-actions"><div><h2>SMTP 邮件服务</h2><p>用于注册和绑定邮箱验证码。</p></div><span class="badge <?= $configuration['configured'] ? 'active' : 'pending' ?>"><?= $configuration['configured'] ? '已配置' : '待配置' ?></span></div>
+<div class="content-grid">
+    <section class="panel"><div class="panel-header"><h3>SMTP 配置</h3></div><div class="panel-body"><form method="post" action="/admin/email/settings"><input type="hidden" name="_token" value="<?= escape_html($csrfToken) ?>"><div class="form-grid">
+        <div class="form-field full"><label for="host">SMTP 主机</label><input class="input code-value" id="host" name="host" value="<?= escape_html($configuration['host']) ?>" placeholder="mail.example.com" required></div>
+        <div class="form-field"><label for="port">端口</label><input class="input" id="port" name="port" type="number" min="1" max="65535" value="<?= (int) $configuration['port'] ?>" required></div>
+        <div class="form-field"><label for="encryption">加密方式</label><select class="input" id="encryption" name="encryption"><option value="ssl" <?= $configuration['encryption'] === 'ssl' ? 'selected' : '' ?>>SSL</option><option value="tls" <?= $configuration['encryption'] === 'tls' ? 'selected' : '' ?>>STARTTLS</option><option value="none" <?= $configuration['encryption'] === 'none' ? 'selected' : '' ?>>不加密</option></select></div>
+        <div class="form-field full"><label for="username">SMTP 用户名</label><input class="input" id="username" name="username" value="<?= escape_html($configuration['username']) ?>" autocomplete="username"></div>
+        <div class="form-field full"><label for="password">SMTP 密码</label><input class="input" id="password" name="password" type="password" placeholder="<?= $configuration['passwordConfigured'] ? '已保存，留空表示不修改' : '请输入 SMTP 密码' ?>" autocomplete="new-password"></div>
+        <div class="form-field"><label for="from_email">发件邮箱</label><input class="input" id="from_email" name="from_email" type="email" value="<?= escape_html($configuration['fromEmail']) ?>" required></div>
+        <div class="form-field"><label for="from_name">发件名称</label><input class="input" id="from_name" name="from_name" value="<?= escape_html($configuration['fromName']) ?>" maxlength="120"></div>
+    </div><div class="form-footer"><button class="button primary" type="submit">保存 SMTP 配置</button></div></form></div></section>
+    <section class="panel"><div class="panel-header"><h3>发送测试邮件</h3></div><div class="panel-body"><form method="post" action="/admin/email/test"><input type="hidden" name="_token" value="<?= escape_html($csrfToken) ?>"><div class="form-grid"><div class="form-field full"><label for="test_email">收件邮箱</label><input class="input" id="test_email" name="email" type="email" value="<?= escape_html($admin['email']) ?>" required></div></div><div class="form-footer"><button class="button" type="submit">发送测试邮件</button></div></form></div></section>
+</div>
+<?php require __DIR__ . '/../partials/admin_footer.php'; ?>

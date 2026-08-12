@@ -1,0 +1,22 @@
+<?php require __DIR__ . '/../partials/merchant_header.php'; ?>
+<div class="page-actions"><div><h2>账户设置</h2><p>管理用户名、绑定邮箱和登录密码。</p></div></div>
+<div class="content-grid settings-grid">
+    <section class="panel"><div class="panel-header"><h3>商户资料</h3></div><div class="panel-body detail-list">
+        <div class="detail-row"><span>商户名称</span><strong><?= escape_html($merchant['name']) ?></strong></div>
+        <div class="detail-row"><span>商户标识</span><strong class="code-value"><?= escape_html($merchant['slug']) ?></strong></div>
+        <div class="detail-row"><span>套餐</span><strong><?= escape_html($subscription['plan_name'] ?? '按次计费账户') ?></strong></div>
+        <div class="detail-row"><span>状态</span><strong><span class="badge <?= escape_html($merchant['status']) ?>"><?= escape_html(record_status_label($merchant['status'])) ?></span></strong></div>
+        <div class="detail-row"><span>创建时间</span><strong><?= escape_html($merchant['created_at']) ?></strong></div>
+    </div></section>
+    <section class="panel"><div class="panel-header"><h3>修改用户名</h3></div><div class="panel-body"><form method="post" action="/workspace/account/profile"><input type="hidden" name="_token" value="<?= escape_html($csrfToken) ?>"><div class="form-grid"><div class="form-field full"><label for="name">用户名</label><input class="input" id="name" name="name" value="<?= escape_html($user['name']) ?>" maxlength="80" required></div></div><div class="form-footer"><button class="button primary" type="submit">保存用户名</button></div></form></div></section>
+    <section class="panel"><div class="panel-header"><div><h3>修改绑定邮箱</h3><p>当前邮箱：<?= escape_html($user['email']) ?></p></div></div><div class="panel-body">
+        <?php if ($pendingAccountEmail === ''): ?>
+            <form method="post" action="/workspace/account/email-code"><input type="hidden" name="_token" value="<?= escape_html($csrfToken) ?>"><div class="form-grid"><div class="form-field full"><label for="new_email">新邮箱</label><input class="input" id="new_email" name="email" type="email" autocomplete="email" required></div></div><div class="form-footer"><button class="button primary" type="submit">发送验证码</button></div></form>
+        <?php else: ?>
+            <div class="detail-list"><div class="detail-row"><span>待验证邮箱</span><strong><?= escape_html($pendingAccountEmail) ?></strong></div></div>
+            <form method="post" action="/workspace/account/email"><input type="hidden" name="_token" value="<?= escape_html($csrfToken) ?>"><input type="hidden" name="email" value="<?= escape_html($pendingAccountEmail) ?>"><div class="form-grid"><div class="form-field"><label for="email_code">邮箱验证码</label><input class="input code-value" id="email_code" name="verification_code" inputmode="numeric" minlength="6" maxlength="6" autocomplete="one-time-code" required></div><div class="form-field"><label for="email_current_password">当前密码</label><input class="input" id="email_current_password" name="current_password" type="password" autocomplete="current-password" required></div></div><div class="form-footer"><a class="button" href="/workspace/account?reset_email=1">重新填写邮箱</a><button class="button" type="submit" formaction="/workspace/account/email-code" formnovalidate>重新发送验证码</button><button class="button primary" type="submit">确认更换邮箱</button></div></form>
+        <?php endif; ?>
+    </div></section>
+    <section class="panel"><div class="panel-header"><h3>修改登录密码</h3></div><div class="panel-body"><form method="post" action="/workspace/account/password"><input type="hidden" name="_token" value="<?= escape_html($csrfToken) ?>"><div class="form-grid"><div class="form-field full"><label for="current_password">当前密码</label><input class="input" id="current_password" name="current_password" type="password" autocomplete="current-password" required></div><div class="form-field full"><label for="password">新密码</label><input class="input" id="password" name="password" type="password" minlength="10" autocomplete="new-password" required></div><div class="form-field full"><label for="password_confirmation">确认新密码</label><input class="input" id="password_confirmation" name="password_confirmation" type="password" minlength="10" autocomplete="new-password" required></div></div><div class="form-footer"><button class="button primary" type="submit">修改密码</button></div></form></div></section>
+</div>
+<?php require __DIR__ . '/../partials/merchant_footer.php'; ?>

@@ -1,0 +1,24 @@
+<?php require __DIR__ . '/../partials/admin_header.php'; ?>
+<div class="page-actions"><div><h2><?= $isEdit ? '编辑套餐' : '新建套餐' ?></h2><p>配置会员权益、生成计费和经营规模，到期后自动恢复基础账户。</p></div><a class="button" href="/admin/plans">返回列表</a></div>
+<section class="panel">
+    <div class="panel-header"><div><h3>套餐定位</h3><p>已购买订阅保留购买时的权益快照，后续修改只影响新购买。</p></div></div>
+    <div class="panel-body"><form method="post" action="<?= escape_html($formAction) ?>">
+        <input type="hidden" name="_token" value="<?= escape_html($csrfToken) ?>">
+        <div class="form-grid">
+            <div class="form-field"><label for="code">套餐代码</label><input class="input code-value" id="code" name="code" maxlength="40" value="<?= escape_html($plan['code']) ?>" placeholder="monthly_unlimited" required><small>用于内部标识，建议创建后不要修改。</small></div>
+            <div class="form-field"><label for="name">套餐名称</label><input class="input" id="name" name="name" maxlength="120" value="<?= escape_html($plan['name']) ?>" placeholder="月度无限生成套餐" required></div>
+            <div class="form-field full"><label for="audience_label">适用人群</label><input class="input" id="audience_label" name="audience_label" maxlength="120" value="<?= escape_html($plan['audience_label'] ?? '') ?>" placeholder="例如：适合 1-3 家店的专业商家"><small>商户端优先展示这句业务定位，不展示内部 L 等级。</small></div>
+            <div class="form-field full"><label for="description">套餐说明</label><textarea class="input" id="description" name="description" maxlength="1000" placeholder="商户端展示的权益说明"><?= escape_html($plan['description'] ?? '') ?></textarea></div>
+            <div class="form-field"><label for="duration_days">有效天数</label><input class="input" id="duration_days" name="duration_days" type="number" min="1" max="3650" value="<?= (int) $plan['duration_days'] ?>" required><small>日套餐填 1，月套餐通常填 30。</small></div>
+            <div class="form-field"><label for="price_credits">购买所需点数</label><input class="input" id="price_credits" name="price_credits" type="number" min="0" max="1000000" value="<?= (int) $plan['price_credits'] ?>" required></div>
+            <div class="form-field"><label for="tier_level">套餐等级</label><input class="input" id="tier_level" name="tier_level" type="number" min="1" max="999" value="<?= (int) ($plan['tier_level'] ?? 1) ?>" required><small>数字越大等级越高；生效期间只允许购买更高等级。</small></div>
+            <div class="form-field"><label for="daily_generation_limit">每日生成上限</label><input class="input" id="daily_generation_limit" name="daily_generation_limit" type="number" min="0" max="100000" value="<?= (int) $plan['daily_generation_limit'] ?>" required><small>按图片张数统计，0 表示跟随系统限制。</small></div>
+            <div class="form-field"><label for="sort_order">显示顺序</label><input class="input" id="sort_order" name="sort_order" type="number" min="0" max="9999" value="<?= (int) $plan['sort_order'] ?>" required></div>
+            <div class="form-field full"><span class="field-label">功能与计费权益</span><div class="choice-grid"><label class="choice"><input type="checkbox" name="generation_unlimited" value="1" <?= (int) $plan['generation_unlimited'] === 1 ? 'checked' : '' ?>>套餐内图片生成免点数</label><label class="choice"><input type="checkbox" name="recognition_unlimited" value="1" <?= (int) $plan['recognition_unlimited'] === 1 ? 'checked' : '' ?>>套餐内商品识别免点数</label></div></div>
+            <div class="form-field full"><span class="field-label">经营规模限额</span><div class="form-grid plan-limit-grid"><div class="form-field"><label for="sku_limit">SKU 数量</label><input class="input" id="sku_limit" name="sku_limit" type="number" min="0" max="100000" value="<?= (int) ($plan['sku_limit'] ?? 0) ?>" required><small>0 不额外限制</small></div><div class="form-field"><label for="batch_image_limit">单次生成图片</label><input class="input" id="batch_image_limit" name="batch_image_limit" type="number" min="0" max="<?= generation_job_image_limit() ?>" value="<?= (int) ($plan['batch_image_limit'] ?? 0) ?>" required><small>0 跟随系统上限</small></div><div class="form-field"><label for="concurrent_job_limit">同时进行任务</label><input class="input" id="concurrent_job_limit" name="concurrent_job_limit" type="number" min="0" max="100" value="<?= (int) ($plan['concurrent_job_limit'] ?? 0) ?>" required><small>0 不额外限制</small></div></div></div>
+            <div class="form-field"><label for="status">销售状态</label><select class="input" id="status" name="status"><option value="active" <?= $plan['status'] === 'active' ? 'selected' : '' ?>>在售</option><option value="inactive" <?= $plan['status'] === 'inactive' ? 'selected' : '' ?>>下架</option></select></div>
+        </div>
+        <div class="form-footer"><a class="button" href="/admin/plans">取消</a><button class="button primary" type="submit"><?= $isEdit ? '保存修改' : '创建套餐' ?></button></div>
+    </form></div>
+</section>
+<?php require __DIR__ . '/../partials/admin_footer.php'; ?>

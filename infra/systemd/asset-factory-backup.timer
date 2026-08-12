@@ -1,0 +1,11 @@
+[Unit]
+Description=Weekly verified AI Asset Factory backup
+
+[Timer]
+OnCalendar=Sun *-*-* 03:17:00
+Persistent=true
+RandomizedDelaySec=30m
+Unit=asset-factory-backup.service
+
+[Install]
+WantedBy=timers.target
