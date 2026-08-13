@@ -76,8 +76,13 @@ jobs:
             apps/server/dist/*.zip
             apps/server/dist/SHA256SUMS.txt
 
-      - name: Create or update GitHub release
+      - name: Create draft and publish immutable GitHub release
         run: |
           gh release view "$RELEASE_REF" >/dev/null 2>&1 || \
-            gh release create "$RELEASE_REF" --verify-tag --generate-notes
+            gh release create "$RELEASE_REF" --verify-tag --generate-notes --draft
+          test "$(gh release view "$RELEASE_REF" --json isDraft --jq .isDraft)" = "true" || {
+            echo "::error::Release $RELEASE_REF is already published and immutable."
+            exit 1
+          }
           gh release upload "$RELEASE_REF" apps/server/dist/* --clobber
+          gh release edit "$RELEASE_REF" --draft=false
