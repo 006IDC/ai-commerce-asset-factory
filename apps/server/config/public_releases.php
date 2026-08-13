@@ -4,6 +4,16 @@ declare(strict_types=1);
 
 return [
     [
+        'version' => '0.63.14',
+        'source_reference' => 'public-snapshot/0.63.14',
+        'public_title' => '开源配置与发布校验统一',
+        'public_summary' => '安装、持续集成和发布包现在共用同一份环境变量示例，避免不同入口出现配置差异；发布流程同时生成校验文件、软件物料清单和来源证明，便于核对下载内容。',
+        'highlights' => ['环境变量示例统一为单一来源', '安装包继续只包含生产依赖', '发布产物增加校验与来源证明'],
+        'category' => 'admin-reliability',
+        'milestone' => false,
+        'visible' => true,
+    ],
+    [
         'version' => '0.63.13',
         'source_reference' => 'public-snapshot/0.63.13',
         'public_title' => '多图审核断点恢复修复',

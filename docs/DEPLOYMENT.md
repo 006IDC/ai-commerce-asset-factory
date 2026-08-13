@@ -11,7 +11,7 @@
 ## 2. 安装源码
 
 ```bash
-git clone https://github.com/example/ai-commerce-asset-factory.git
+git clone https://github.com/006IDC/ai-commerce-asset-factory.git
 cd ai-commerce-asset-factory/apps/server
 composer install --no-dev --optimize-autoloader
 cp ../../.env.example .env

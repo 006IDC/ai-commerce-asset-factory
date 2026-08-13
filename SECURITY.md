@@ -2,7 +2,7 @@
 
 ## 报告漏洞
 
-请使用仓库的私密 Security Advisory 报告安全问题。不要在公开 Issue 中提交漏洞利用、用户数据、服务器地址或任何凭据。仓库维护者应开启 GitHub 私密漏洞报告。
+请使用仓库 **Security → Advisories → Report a vulnerability** 的私密入口报告安全问题。不要在公开 Issue 中提交漏洞利用、用户数据、服务器地址或任何凭据。
 
 ## 密钥规则
 

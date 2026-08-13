@@ -6,22 +6,33 @@ on:
       - 'apps/server/**'
       - 'services/**'
       - 'infra/**'
+      - '.env.example'
+      - 'docker-compose.yml'
       - '.github/workflows/server-ci.yml'
   pull_request:
     paths:
       - 'apps/server/**'
       - 'services/**'
       - 'infra/**'
+      - '.env.example'
+      - 'docker-compose.yml'
       - '.github/workflows/server-ci.yml'
   workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: server-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   python-services:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
           python-version: '3.12'
           cache: 'pip'
@@ -52,9 +63,9 @@ jobs:
         working-directory: apps/server
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: shivammathur/setup-php@v2
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: '8.3'
           extensions: curl, gd, mbstring, pdo_sqlite, sqlite3, xml, zip
@@ -68,7 +79,7 @@ jobs:
 
       - name: Prepare isolated application database
         run: |
-          cp .example.env .env
+          cp ../../.env.example .env
           app_key="$(php -r "echo 'base64:'.base64_encode(random_bytes(32));")"
           sed -i "s|^APP_KEY =.*|APP_KEY = ${app_key}|" .env
           sed -i 's|^ADMIN_INITIAL_PASSWORD =.*|ADMIN_INITIAL_PASSWORD = ExampleOnly!2026|' .env

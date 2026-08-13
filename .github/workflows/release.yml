@@ -1,0 +1,83 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Existing version tag to build and publish
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+  artifact-metadata: write
+
+concurrency:
+  group: release-${{ inputs.ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_REF: ${{ inputs.ref || github.ref_name }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Check out release tag
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.RELEASE_REF }}
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.3'
+          extensions: curl, gd, mbstring, pdo_sqlite, sqlite3, xml, zip
+          coverage: none
+
+      - name: Build production release
+        working-directory: apps/server
+        run: |
+          version="${RELEASE_REF#v}"
+          expected="$(tr -d '[:space:]' < VERSION)"
+          test "$version" = "$expected"
+          composer validate --strict
+          composer audit --locked --no-dev
+          SOURCE_REVISION="$(git rev-parse HEAD)" \
+            SOURCE_DATE_EPOCH="$(git log -1 --format=%ct)" \
+            bash scripts/build-release.sh "$version"
+          (cd dist && sha256sum *.zip > SHA256SUMS.txt)
+          unzip -tq dist/*.zip
+
+      - name: Generate SPDX SBOM
+        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
+        with:
+          path: apps/server/dist
+          format: spdx-json
+          output-file: apps/server/dist/ai-commerce-asset-factory.spdx.json
+          upload-artifact: false
+          upload-release-assets: false
+
+      - name: Attest release-package SBOM
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: apps/server/dist/*.zip
+          sbom-path: apps/server/dist/ai-commerce-asset-factory.spdx.json
+
+      - name: Attest release assets
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: |
+            apps/server/dist/*.zip
+            apps/server/dist/SHA256SUMS.txt
+
+      - name: Create or update GitHub release
+        run: |
+          gh release view "$RELEASE_REF" >/dev/null 2>&1 || \
+            gh release create "$RELEASE_REF" --verify-tag --generate-notes
+          gh release upload "$RELEASE_REF" apps/server/dist/* --clobber

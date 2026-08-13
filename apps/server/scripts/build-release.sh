@@ -74,6 +74,9 @@ rsync -a "$ROOT_DIR/" "$PACKAGE_DIR/" \
     --exclude '.DS_Store' \
     --exclude '._*'
 
+# 仓库根目录的 .env.example 是唯一公开配置模板；发行包保留为 .example.env。
+cp "$PROJECT_ROOT/.env.example" "$PACKAGE_DIR/.example.env"
+
 mkdir -p "$PACKAGE_DIR/runtime" "$PACKAGE_DIR/public/storage" "$PACKAGE_DIR/database"
 if ! command -v "$COMPOSER_BIN" >/dev/null 2>&1; then
     printf 'Composer executable not found: %s\n' "$COMPOSER_BIN" >&2

@@ -1,5 +1,11 @@
 # AI Commerce Asset Factory
 
+[![Server CI](https://github.com/006IDC/ai-commerce-asset-factory/actions/workflows/server-ci.yml/badge.svg)](https://github.com/006IDC/ai-commerce-asset-factory/actions/workflows/server-ci.yml)
+[![Release](https://img.shields.io/github/v/release/006IDC/ai-commerce-asset-factory)](https://github.com/006IDC/ai-commerce-asset-factory/releases)
+[![License](https://img.shields.io/github/license/006IDC/ai-commerce-asset-factory)](LICENSE)
+
+由 [零零陆云计算（006IDC）](https://github.com/006IDC) 独立维护。
+
 面向电商商家的 AI 商品素材工作台，覆盖商品建档、产品报告、商品上新套图、详情页、自由创作、视频任务、素材管理、点数结算和运营后台。
 
 ## 系统组成

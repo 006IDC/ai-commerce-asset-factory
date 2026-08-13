@@ -1,22 +1,18 @@
 {
-    "name": "topthink/think",
-    "description": "the new thinkphp framework",
+    "name": "006idc/ai-commerce-asset-factory",
+    "description": "Open-source AI commerce asset generation workspace",
     "type": "project",
     "keywords": [
-        "framework",
+        "ai-commerce",
+        "ecommerce",
         "thinkphp",
-        "ORM"
+        "image-generation"
     ],
-    "homepage": "https://www.thinkphp.cn/",
+    "homepage": "https://github.com/006IDC/ai-commerce-asset-factory",
     "license": "Apache-2.0",
     "authors": [
         {
-            "name": "liu21st",
-            "email": "liu21st@gmail.com"
-        },
-        {
-            "name": "yunwuxin",
-            "email": "448901948@qq.com"
+            "name": "006IDC"
         }
     ],
     "require": {
