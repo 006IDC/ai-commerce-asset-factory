@@ -10,13 +10,6 @@ on:
       - 'docker-compose.yml'
       - '.github/workflows/server-ci.yml'
   pull_request:
-    paths:
-      - 'apps/server/**'
-      - 'services/**'
-      - 'infra/**'
-      - '.env.example'
-      - 'docker-compose.yml'
-      - '.github/workflows/server-ci.yml'
   workflow_dispatch:
 
 permissions:
