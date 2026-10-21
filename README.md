@@ -33,6 +33,8 @@
 
 版本变化见[变更记录](CHANGELOG.md)，源码与既有发行入口见[历史范围与缺口](docs/history-overview.md)。适用环境和部署检查以对应版本文档为准。
 
+2026-10-22 依赖维护：PHPMailer 锁定为 7.1.1，Ark Bridge 使用 volcengine-python-sdk 5.0.53 与 cryptography 50.0.2；Flysystem 保持已修复路径校验漏洞的 3.35.3。本次不新增发行版本，兼容性回归随 Server CI 执行。
+
 ## 许可证和维护
 
 由[零零陆云计算（006IDC）](https://github.com/006IDC)独立维护。自有源码按 [Apache License 2.0](LICENSE) 发布。第三方来源、版权和许可见 [NOTICE](NOTICE) 与[第三方声明](THIRD_PARTY_NOTICES.md)。

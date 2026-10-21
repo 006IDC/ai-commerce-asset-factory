@@ -1,5 +1,13 @@
 # AI 商品素材工厂 · 变更记录
 
+## 2026-10-22 · 依赖兼容与安全回归维护
+
+- PHPMailer 从 6.12.0 升级并锁定为 7.1.1，保留现有 SMTP 发送接口；Ark Bridge 将 volcengine-python-sdk 从 5.0.42 升级为 5.0.53、cryptography 从 46.0.7 升级为 50.0.2。
+- 核对 [Flysystem 官方公告](https://github.com/thephpleague/flysystem/security/advisories/GHSA-cxf4-7mrp-vvpr)：GHSA-cxf4-7mrp-vvpr / CVE-2026-102601 影响不高于 3.35.2；当前锁文件已为修复版 3.35.3，保持该最小版本并增加畸形 UTF-8 与控制字符拒绝回归，不绕过 Composer 安全审计。
+- 增加邮件内容构造、真实 Ark SDK 请求序列化与 STS 缓存、合成证书加密往返回归，使用本地模拟响应，不调用付费模型。
+- cryptography 50.0.2 要求 Python 3.9+；49.0 起不再提供 Intel macOS 与 32 位 Windows 轮子，部署前需核对平台。项目 CI 继续使用 Linux / Python 3.12。
+- 本次维护不新增软件版本、源码标签或发行包发布；真实服务商、TLS 邮件投递及生产部署不在本次合成回归范围。
+
 ## 2026-10-21 · 文档与版本导航维护
 
 - 统一项目首页、仓库简介和版本导航；保留原有开源版本、许可及发行记录。

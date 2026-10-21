@@ -271,5 +271,61 @@ class ProviderNormalizationTest(unittest.TestCase):
         self.assertIsNone(app.normalize_image_seed(None))
 
 
+class DependencyCompatibilityTest(unittest.TestCase):
+    """Exercise installed SDK consumers without contacting a provider."""
+
+    def test_real_sdk_image_request_uses_expected_wire_contract(self) -> None:
+        import httpx
+
+        def respond(request: httpx.Request) -> httpx.Response:
+            self.assertEqual(request.url.path, "/api/v3/images/generations")
+            self.assertEqual(request.headers["authorization"], "Bearer synthetic-token")
+            body = json.loads(request.content)
+            self.assertEqual(body["model"], app.ARK_IMAGE_MODEL)
+            return httpx.Response(200, json={"data": [{"url": "https://example.com/image.png"}]})
+
+        with httpx.Client(transport=httpx.MockTransport(respond)) as transport:
+            with app.Ark(api_key="synthetic-token", http_client=transport, max_retries=0) as client:
+                result = client.images.generate(model=app.ARK_IMAGE_MODEL, prompt="synthetic")
+                self.assertEqual(app.model_json(result)["data"][0]["url"], "https://example.com/image.png")
+
+    def test_real_sts_manager_refreshes_and_caches_synthetic_token(self) -> None:
+        import time
+        from unittest.mock import Mock
+
+        manager = app.StsTokenManager("synthetic-ak", "synthetic-sk", "cn-beijing")
+        manager.api_instance.get_api_key = Mock(return_value=type("Response", (), {
+            "api_key": "synthetic-token", "expired_time": int(time.time()) + 86400,
+        })())
+        for _ in range(2):
+            self.assertEqual(manager.get(app.ARK_IMAGE_MODEL, resource_type="presetendpoint", project_name="default"), "synthetic-token")
+        manager.api_instance.get_api_key.assert_called_once()
+        request = manager.api_instance.get_api_key.call_args.args[0]
+        self.assertEqual(request.resource_ids, [app.ARK_IMAGE_MODEL])
+        self.assertEqual(request.project_name, "default")
+
+    def test_sdk_crypto_roundtrip_with_generated_certificate(self) -> None:
+        from datetime import datetime, timedelta, timezone
+        from cryptography import x509
+        from cryptography.hazmat.primitives import hashes, serialization
+        from cryptography.hazmat.primitives.asymmetric import ec
+        from volcenginesdkarkruntime._utils._key_agreement import key_agreement_client
+
+        private_key = ec.generate_private_key(ec.SECP256R1())
+        name = x509.Name([x509.NameAttribute(x509.NameOID.COMMON_NAME, "synthetic.example")])
+        now = datetime.now(timezone.utc)
+        certificate = (x509.CertificateBuilder().subject_name(name).issuer_name(name)
+                       .public_key(private_key.public_key()).serial_number(x509.random_serial_number())
+                       .not_valid_before(now - timedelta(minutes=1)).not_valid_after(now + timedelta(days=1))
+                       .add_extension(x509.SubjectAlternativeName([
+                           x509.DNSName("ring.synthetic"), x509.DNSName("key.synthetic")]), critical=False)
+                       .sign(private_key, hashes.SHA256()))
+        crypto = key_agreement_client(certificate.public_bytes(serialization.Encoding.PEM).decode())
+        key, nonce, token, encrypted = crypto.encrypt_string("synthetic payload")
+        self.assertEqual(crypto.decrypt_string_with_key(key, nonce, encrypted), "synthetic payload")
+        self.assertTrue(token)
+        self.assertEqual(crypto.get_cert_ring_key_id(), ("synthetic", "synthetic"))
+
+
 if __name__ == "__main__":
     unittest.main()
