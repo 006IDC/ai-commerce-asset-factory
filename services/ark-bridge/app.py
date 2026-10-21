@@ -12,8 +12,10 @@ import base64
 import json
 import logging
 import os
+from pathlib import Path
 import secrets
 import signal
+import stat
 import sys
 import threading
 import urllib.error
@@ -52,6 +54,34 @@ MODELS = {
 }
 MAX_BODY_BYTES = 64 * 1024 * 1024
 IMAGE_MIME_TYPES = {"image/jpeg", "image/png", "image/webp"}
+BRIDGE_SECRET_NAMES = ("VOLC_ACCESSKEY", "VOLC_SECRETKEY", "ZHIPU_API_KEY", "ARK_BRIDGE_API_KEY")
+
+
+def bridge_credentials() -> dict[str, str]:
+    """Read systemd's private runtime credential, or the legacy process env."""
+    directory = os.environ.get("CREDENTIALS_DIRECTORY", "").strip()
+    if not directory:
+        return {name: os.environ.get(name, "").strip() for name in BRIDGE_SECRET_NAMES}
+    try:
+        descriptor = os.open(Path(directory) / "ark-bridge-secrets", os.O_RDONLY | os.O_NOFOLLOW)
+        with os.fdopen(descriptor, "r", encoding="utf-8") as credential:
+            metadata = os.fstat(credential.fileno())
+            if (not stat.S_ISREG(metadata.st_mode)
+                    or metadata.st_uid not in {0, os.geteuid()}
+                    or metadata.st_mode & 0o077):
+                raise ValueError("credential is not private")
+            content = credential.read(65537)
+        if len(content) > 65536:
+            raise ValueError("credential is oversized")
+        values = json.loads(content)
+        if (not isinstance(values, dict) or set(values) != set(BRIDGE_SECRET_NAMES)
+                or any(not isinstance(values[name], str) or not values[name].strip()
+                       or "\n" in values[name] or "\r" in values[name]
+                       for name in BRIDGE_SECRET_NAMES)):
+            raise ValueError("credential schema is invalid")
+        return {name: values[name].strip() for name in BRIDGE_SECRET_NAMES}
+    except (OSError, ValueError, UnicodeError):
+        raise RuntimeError("Ark Bridge runtime credential is missing, invalid or not private") from None
 
 
 class BridgeError(RuntimeError):
@@ -64,10 +94,11 @@ class BridgeError(RuntimeError):
 
 class ArkBridge:
     def __init__(self) -> None:
-        access_key = os.environ.get("VOLC_ACCESSKEY", "").strip()
-        secret_key = os.environ.get("VOLC_SECRETKEY", "").strip()
-        self.zhipu_api_key = os.environ.get("ZHIPU_API_KEY", "").strip()
-        self.internal_key = os.environ.get("ARK_BRIDGE_API_KEY", "").strip()
+        credentials = bridge_credentials()
+        access_key = credentials["VOLC_ACCESSKEY"]
+        secret_key = credentials["VOLC_SECRETKEY"]
+        self.zhipu_api_key = credentials["ZHIPU_API_KEY"]
+        self.internal_key = credentials["ARK_BRIDGE_API_KEY"]
         self.region = os.environ.get("VOLC_REGION", "cn-beijing").strip()
         self.project = os.environ.get("VOLC_PROJECT", "default").strip()
         if (

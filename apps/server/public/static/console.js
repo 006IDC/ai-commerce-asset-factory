@@ -1,3 +1,33 @@
+function safeImageUrl(value) {
+    var text = String(value || '').trim();
+    if (!text) return '';
+    try {
+        var url = new URL(text, window.location.href);
+        if (url.protocol === 'http:' || url.protocol === 'https:') return url.href;
+        // Local previews stay images; these URLs must never be reused as navigation links.
+        if (url.protocol === 'blob:' && url.origin === window.location.origin) return url.href;
+        if (/^data:image\/[a-z0-9.+-]+(?:;[^,]*)?,/i.test(text)) return url.href;
+    } catch (error) {
+        // Invalid image locations are left empty rather than interpreted as another URL type.
+    }
+    return '';
+}
+
+function safeWorkspaceUrl(value, fallback) {
+    if (!String(value || '').trim()) return fallback;
+    try {
+        var url = new URL(String(value || ''), window.location.href);
+        if ((url.protocol === 'http:' || url.protocol === 'https:')
+            && url.origin === window.location.origin && !url.username && !url.password
+            && url.pathname.indexOf('/workspace/') === 0) {
+            return url.href;
+        }
+    } catch (error) {
+        // Internal actions must remain in this workspace even if a DOM attribute is malformed.
+    }
+    return fallback;
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     setupTopNavigationMenus();
     setupDismissibleDetails();
@@ -683,7 +713,7 @@ function setupProductLaunch() {
             var image = document.createElement('img');
             var url = URL.createObjectURL(selected);
             previewUrls.push(url);
-            image.src = url;
+            image.src = safeImageUrl(url);
             image.alt = index === 0 ? '商品身份主参考图' : '商品补充参考图';
             var copy = document.createElement('span');
             var role = document.createElement('b');
@@ -1269,7 +1299,7 @@ function setupSkuImagePreview() {
     input.addEventListener('change', function () {
         var file = input.files && input.files[0];
         if (!file) { return; }
-        preview.src = URL.createObjectURL(file);
+        preview.src = safeImageUrl(URL.createObjectURL(file));
         preview.hidden = false;
         empty.hidden = true;
     });
@@ -1514,7 +1544,7 @@ function setupGenerationReference() {
             image.removeAttribute('src');
             return;
         }
-        image.src = imageUrl;
+        image.src = safeImageUrl(imageUrl);
         image.setAttribute('data-fallback', backupUrl || '');
         image.removeAttribute('data-fallback-used');
         title.textContent = editEnabled ? '将使用商品参考图生成' : '当前模型将使用纯文字生成';
@@ -1554,14 +1584,14 @@ function setupSkuReportQuickForm() {
         var reportId = option.getAttribute('data-report-id') || '';
         var updatedAt = option.getAttribute('data-report-updated') || '';
         var hasImage = Boolean(option.getAttribute('data-image'));
-        reportForm.action = reportForm.getAttribute('data-action-template').replace('__SKU__', skuId);
+        reportForm.action = safeWorkspaceUrl((reportForm.getAttribute('data-action-template') || '').replace('__SKU__', encodeURIComponent(skuId)), '');
         reportForm.querySelector('input[name="platform"]').value = platform.value;
         reportForm.querySelector('input[name="language"]').value = language.value;
         title.textContent = reportId ? '商品资料已关联' : '该商品尚无商品资料';
         description.textContent = reportId ? '最近更新 ' + updatedAt + '，普通素材会自动读取报告。' : '先生成报告，可提升卖点、场景和商品细节的一致性。';
         actionLabel.textContent = reportId ? '更新报告' : '生成报告';
         link.hidden = !reportId;
-        link.href = reportId ? '/workspace/detail-pages/' + reportId : '#';
+        link.href = reportId ? '/workspace/detail-pages/' + encodeURIComponent(reportId) : '#';
         submit.disabled = !hasImage;
         submit.title = hasImage ? '' : '请先在 SKU 详情中上传商品参考图';
         panel.hidden = false;
@@ -1776,7 +1806,7 @@ function setupPodCarousel() {
             return;
         }
         objectUrl = URL.createObjectURL(file);
-        image.src = objectUrl;
+        image.src = safeImageUrl(objectUrl);
         filename.textContent = file.name;
         preview.hidden = false;
         placeholder.hidden = true;
@@ -1830,7 +1860,7 @@ function setupListingBundle() {
             ? '该商品有 ' + matching.length + ' 个方案，已自动选择最近更新的一项'
             : '该商品还没有详情页方案，请在下方建立';
         createForm.hidden = !skuId || matching.length > 0;
-        createForm.action = skuId ? createForm.getAttribute('data-action-template').replace('__SKU__', skuId) : '';
+        createForm.action = skuId ? safeWorkspaceUrl((createForm.getAttribute('data-action-template') || '').replace('__SKU__', encodeURIComponent(skuId)), '') : '';
         createForm.querySelector('button[type="submit"]').disabled = !skuId || !hasImage;
         form.dispatchEvent(new Event('bundle-project-change'));
     }
@@ -1882,15 +1912,15 @@ function setupDetailGeneration() {
         selectedProject = projectSelect.options[projectSelect.selectedIndex];
         projectSelect.disabled = !skuId || matching.length === 0;
         var hasSelectedProject = Boolean(selectedProject && selectedProject.value);
-        form.setAttribute('action', hasSelectedProject ? '/workspace/detail-pages/' + selectedProject.value + '/generate' : '');
+        form.setAttribute('action', hasSelectedProject ? '/workspace/detail-pages/' + encodeURIComponent(selectedProject.value) + '/generate' : '');
         projectLink.hidden = !hasSelectedProject;
-        projectLink.href = hasSelectedProject ? '/workspace/detail-pages/' + selectedProject.value : '#';
+        projectLink.href = hasSelectedProject ? '/workspace/detail-pages/' + encodeURIComponent(selectedProject.value) : '#';
         submit.disabled = !hasSelectedProject || form.getAttribute('data-creative-ready') === '0'
             || submit.hasAttribute('data-model-disabled');
         hint.textContent = !skuId ? '先选择商品' : matching.length > 0 ? '该商品有 ' + matching.length + ' 个方案，已自动带入最近更新的一项' : '该商品还没有详情页方案，可在下方建立首个方案';
 
         createForm.hidden = !skuId || matching.length > 0;
-        createForm.action = skuId ? createForm.getAttribute('data-action-template').replace('__SKU__', skuId) : '';
+        createForm.action = skuId ? safeWorkspaceUrl((createForm.getAttribute('data-action-template') || '').replace('__SKU__', encodeURIComponent(skuId)), '') : '';
         var createButton = createForm.querySelector('button[type="submit"]');
         createButton.disabled = !hasImage;
         if (!skuId) {
@@ -2416,7 +2446,7 @@ function setupFreeGeneration() {
                 var image = document.createElement('img');
                 var url = URL.createObjectURL(file);
                 referencePreviewUrls.push(url);
-                image.src = url;
+                image.src = safeImageUrl(url);
                 image.alt = '临时参考图 ' + (index + 1);
                 var label = document.createElement('span');
                 label.textContent = index === 0 ? '主参考' : String(index + 1);
@@ -2582,7 +2612,7 @@ function setupFreeGeneration() {
         var references = turn.querySelector('[data-optimistic-references]');
         selectedReferenceFiles.forEach(function (file, index) {
             var image = document.createElement('img');
-            image.src = URL.createObjectURL(file);
+            image.src = safeImageUrl(URL.createObjectURL(file));
             image.alt = '本次参考图 ' + (index + 1);
             image.addEventListener('load', function () { URL.revokeObjectURL(image.src); }, {once: true});
             references.appendChild(image);
@@ -3077,7 +3107,7 @@ function setupImageFallbacks() {
                 return;
             }
             image.setAttribute('data-fallback-used', '1');
-            image.src = fallback;
+            image.src = safeImageUrl(fallback);
         }
         image.addEventListener('error', useFallback);
         if (image.complete && image.naturalWidth === 0) {
@@ -3171,7 +3201,7 @@ function setupAssetPreview() {
         image.alt = button.getAttribute('data-asset-preview-title') || '素材预览';
         image.setAttribute('data-fallback', button.getAttribute('data-asset-preview-fallback') || '');
         image.removeAttribute('data-fallback-used');
-        image.src = button.getAttribute('data-asset-preview-src') || '';
+        image.src = safeImageUrl(button.getAttribute('data-asset-preview-src') || '');
         title.textContent = image.alt;
         var assetId = button.getAttribute('data-asset-preview-id') || '';
         download.hidden = assetId === '';
@@ -3230,7 +3260,7 @@ function setupAssetPreview() {
             return;
         }
         image.setAttribute('data-fallback-used', '1');
-        image.src = fallback;
+        image.src = safeImageUrl(fallback);
     });
     close.addEventListener('click', closeViewer);
     viewer.addEventListener('keydown', function (event) {
@@ -3254,7 +3284,7 @@ function setupAssetPreview() {
         baseHeight = 0;
         content.style.width = '1px';
         content.style.height = '1px';
-        image.src = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+        image.src = safeImageUrl('data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
         image.alt = '';
         title.textContent = '';
         counter.textContent = '';
@@ -3488,7 +3518,7 @@ function setupCanvasEditor() {
                 if (job.status === 'completed') {
                     pendingTasks.delete(taskId);
                     if (String(assetInput.value) === String(sourceAssetId) && taskId === latestTaskId) {
-                        resultImage.src = job.imageUrl;
+                        resultImage.src = safeImageUrl(job.imageUrl);
                         resultMeta.textContent = '已输出 ' + job.outputWidth + '×' + job.outputHeight + '，并归档到素材库';
                         editResult.href = '/workspace/canvas?asset_id=' + encodeURIComponent(job.assetId);
                         result.hidden = false;
@@ -3532,7 +3562,7 @@ function setupCanvasEditor() {
         var fallback = image.getAttribute('data-fallback');
         if (fallback && image.getAttribute('data-fallback-used') !== '1') {
             image.setAttribute('data-fallback-used', '1');
-            image.src = fallback;
+            image.src = safeImageUrl(fallback);
         }
     });
     assetSelect.addEventListener('change', function () {
@@ -4197,7 +4227,7 @@ function setupDetailPageCreate() {
             return;
         }
         objectUrl = URL.createObjectURL(file);
-        image.src = objectUrl;
+        image.src = safeImageUrl(objectUrl);
         name.textContent = file.name;
         empty.hidden = true;
         preview.hidden = false;

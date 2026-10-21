@@ -45,6 +45,12 @@ jobs:
         working-directory: services/ark-bridge
         run: python -m unittest test_app.py
 
+      - name: Verify encrypted credential installer
+        run: python infra/scripts/test_ark_bridge_credentials.py
+
+      - name: Verify native systemd encrypted credential round trip
+        run: sudo env ARK_CREDENTIAL_NATIVE_TEST=1 python3 infra/scripts/test_ark_bridge_credentials.py
+
       - name: Run ComfyUI node tests
         working-directory: services/comfyui-asset-factory-nodes
         run: python -m unittest test_asset_factory_nodes.py
@@ -95,6 +101,9 @@ jobs:
             sleep 0.1
           done
           curl -fsS http://127.0.0.1:8088/api/health >/dev/null
+
+      - name: DOM URL security regression
+        run: node tests/dom_security_regression.js
 
       - name: Run contract suite with reliable failure detection
         run: php tests/run-contracts.php

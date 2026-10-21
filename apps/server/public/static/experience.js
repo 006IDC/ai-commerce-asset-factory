@@ -1,6 +1,32 @@
 (function () {
     'use strict';
 
+    function safeImageUrl(value) {
+        var text = String(value || '').trim();
+        if (!text) return '';
+        try {
+            var url = new URL(text, window.location.href);
+            if (url.protocol === 'http:' || url.protocol === 'https:') return url.href;
+            // Local previews stay images; these URLs must never be reused as navigation links.
+            if (url.protocol === 'blob:' && url.origin === window.location.origin) return url.href;
+            if (/^data:image\/[a-z0-9.+-]+(?:;[^,]*)?,/i.test(text)) return url.href;
+        } catch (error) {
+            // Invalid image locations are left empty rather than interpreted as another URL type.
+        }
+        return '';
+    }
+
+    function safeAssetLinkUrl(value) {
+        if (!String(value || '').trim()) return '#';
+        try {
+            var url = new URL(String(value || ''), window.location.href);
+            if (url.protocol === 'http:' || url.protocol === 'https:') return url.href;
+        } catch (error) {
+            // Opening an asset must never execute a script or an active data document.
+        }
+        return '#';
+    }
+
     function setupProgressiveOptions() {
         document.querySelectorAll('[data-progressive-options]').forEach(function (details) {
             var summaryText = details.querySelector('[data-option-summary]');
@@ -75,12 +101,12 @@
             button.addEventListener('click', function () {
                 var src = button.getAttribute('data-asset-detail-src') || '';
                 var fallback = button.getAttribute('data-asset-detail-fallback') || '';
-                image.src = src;
+                image.src = safeImageUrl(src);
                 image.setAttribute('data-fallback', fallback);
                 title.textContent = button.getAttribute('data-asset-detail-title') || '素材详情';
                 meta.textContent = button.getAttribute('data-asset-detail-meta') || '';
-                openLink.href = src;
-                downloadLink.href = button.getAttribute('data-asset-detail-download-url') || src;
+                openLink.href = safeAssetLinkUrl(src);
+                downloadLink.href = safeAssetLinkUrl(button.getAttribute('data-asset-detail-download-url') || src);
                 panel.hidden = false;
                 panel.classList.add('open');
                 close.focus();
