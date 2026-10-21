@@ -1,6 +1,36 @@
 (function () {
     'use strict';
 
+    function safeImageUrl(value) {
+        var text = String(value || '').trim();
+        if (!text) return '';
+        try {
+            var url = new URL(text, window.location.href);
+            if (url.protocol === 'http:' || url.protocol === 'https:') return url.href;
+            // Local previews stay images; these URLs must never be reused as navigation links.
+            if (url.protocol === 'blob:' && url.origin === window.location.origin) return url.href;
+            if (/^data:image\/[a-z0-9.+-]+(?:;[^,]*)?,/i.test(text)) return url.href;
+        } catch (error) {
+            // Invalid image locations are left empty rather than interpreted as another URL type.
+        }
+        return '';
+    }
+
+    function safeWorkspaceUrl(value, fallback) {
+        if (!String(value || '').trim()) return fallback;
+        try {
+            var url = new URL(String(value || ''), window.location.href);
+            if ((url.protocol === 'http:' || url.protocol === 'https:')
+                && url.origin === window.location.origin && !url.username && !url.password
+                && url.pathname.indexOf('/workspace/') === 0) {
+                return url.href;
+            }
+        } catch (error) {
+            // Internal actions must remain in this workspace even if a DOM attribute is malformed.
+        }
+        return fallback;
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         var shell = document.querySelector('[data-image-tools]');
         if (!shell) {
@@ -66,7 +96,7 @@
                 var image = new Image();
                 image.onload = function () { URL.revokeObjectURL(url); resolve(image); };
                 image.onerror = function () { URL.revokeObjectURL(url); reject(new Error('图片无法读取')); };
-                image.src = url;
+                image.src = safeImageUrl(url);
             });
         }
 
@@ -100,7 +130,7 @@
         function showResult(blob, title, meta, extension) {
             revokeResult();
             resultUrl = URL.createObjectURL(blob);
-            resultImage.src = resultUrl;
+            resultImage.src = safeImageUrl(resultUrl);
             resultTitle.textContent = title;
             resultMeta.textContent = meta;
             download.href = resultUrl;
@@ -172,7 +202,7 @@
         function refreshAssetPreview() {
             if (!assetSelect || !assetPreview) return;
             var option = assetSelect.options[assetSelect.selectedIndex];
-            assetPreview.src = option.getAttribute('data-image') || option.getAttribute('data-backup') || '';
+            assetPreview.src = safeImageUrl(option ? option.getAttribute('data-image') || option.getAttribute('data-backup') || '' : '');
         }
 
         function openAiTool(tool) {
@@ -183,7 +213,10 @@
             if (!assetSelect || !assetSelect.value) {
                 return;
             }
-            window.location.href = shell.getAttribute('data-canvas-url') + '?asset_id=' + encodeURIComponent(assetSelect.value) + '&tool=' + encodeURIComponent(tool);
+            var canvasUrl = new URL(safeWorkspaceUrl(shell.getAttribute('data-canvas-url'), '/workspace/canvas'), window.location.href);
+            canvasUrl.searchParams.set('asset_id', assetSelect.value);
+            canvasUrl.searchParams.set('tool', tool);
+            window.location.href = canvasUrl.href;
         }
 
         function runReversePrompt() {
@@ -203,7 +236,7 @@
                     promptOutput.value = prompt;
                     promptResult.hidden = false;
                     if (promptEmpty) promptEmpty.hidden = true;
-                    if (usePrompt) usePrompt.href = data.useUrl || '/workspace/free-create';
+                    if (usePrompt) usePrompt.href = safeWorkspaceUrl(data.useUrl, '/workspace/free-create');
                     setPromptStatus('文字已生成并自动保存', false);
 
                     if (promptHistory) {
@@ -243,7 +276,7 @@
             if (!sourceFiles.length) { clearFiles(); return; }
             if (previewUrl) URL.revokeObjectURL(previewUrl);
             previewUrl = URL.createObjectURL(sourceFiles[0]);
-            previewImage.src = previewUrl;
+            previewImage.src = safeImageUrl(previewUrl);
             preview.hidden = false;
             fileLabel.textContent = sourceFiles.length > 1 ? '已选择 ' + sourceFiles.length + ' 张图片' : sourceFiles[0].name;
             result.hidden = true;
@@ -265,7 +298,7 @@
             promptOutput.value = button.getAttribute('data-prompt') || '';
             promptResult.hidden = false;
             if (promptEmpty) promptEmpty.hidden = true;
-            if (usePrompt) usePrompt.href = button.getAttribute('data-use-url') || '/workspace/free-create';
+            if (usePrompt) usePrompt.href = safeWorkspaceUrl(button.getAttribute('data-use-url'), '/workspace/free-create');
             setPromptStatus('已打开历史文字结果', false);
         });
     });

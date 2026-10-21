@@ -35,6 +35,8 @@
 
 2026-10-22 依赖维护：PHPMailer 锁定为 7.1.1，Ark Bridge 使用 volcengine-python-sdk 5.0.53 与 cryptography 50.0.2；Flysystem 保持已修复路径校验漏洞的 3.35.3。本次不新增发行版本，兼容性回归随 Server CI 执行。
 
+2026-10-22 代码扫描维护：收紧素材与工作区地址的可用协议和范围，保留图片预览；Ark Bridge 提供 systemd 250+ 原生加密凭据安装及读取方式。旧部署迁移要求见 [Bridge 说明](services/ark-bridge/README.md)，本次仅更新源码，不改动运行中的服务。
+
 ## 许可证和维护
 
 由[零零陆云计算（006IDC）](https://github.com/006IDC)独立维护。自有源码按 [Apache License 2.0](LICENSE) 发布。第三方来源、版权和许可见 [NOTICE](NOTICE) 与[第三方声明](THIRD_PARTY_NOTICES.md)。

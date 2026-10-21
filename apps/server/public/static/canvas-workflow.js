@@ -1,6 +1,21 @@
 (function () {
     'use strict';
 
+    function safeImageUrl(value) {
+        var text = String(value || '').trim();
+        if (!text) return '';
+        try {
+            var url = new URL(text, window.location.href);
+            if (url.protocol === 'http:' || url.protocol === 'https:') return url.href;
+            // Local previews stay images; these URLs must never be reused as navigation links.
+            if (url.protocol === 'blob:' && url.origin === window.location.origin) return url.href;
+            if (/^data:image\/[a-z0-9.+-]+(?:;[^,]*)?,/i.test(text)) return url.href;
+        } catch (error) {
+            // Invalid image locations are left empty rather than interpreted as another URL type.
+        }
+        return '';
+    }
+
     function setupCanvasWorkflow() {
         var shell = document.querySelector('[data-canvas-editor]');
         if (!shell || typeof window.Drawflow !== 'function') {
@@ -157,7 +172,7 @@
             var sku = (asset.skuCode || '未归类') + ' · ' + (asset.skuName || '素材');
             var pending = asset.status === 'pending';
             return '<article class="workflow-image-node" data-node-asset-id="' + asset.id + '">' +
-                '<div class="workflow-node-image"><img src="' + escapeHtml(asset.fileUrl) + '" data-fallback="' + escapeHtml(asset.backupFileUrl || '') + '" alt="' + escapeHtml(asset.assetTypeLabel) + '">' +
+                '<div class="workflow-node-image"><img src="' + escapeHtml(safeImageUrl(asset.fileUrl)) + '" data-fallback="' + escapeHtml(safeImageUrl(asset.backupFileUrl || '')) + '" alt="' + escapeHtml(asset.assetTypeLabel) + '">' +
                 '<button type="button" data-node-preview aria-label="放大查看"><i data-lucide="maximize-2"></i></button></div>' +
                 '<div class="workflow-node-copy"><strong>' + escapeHtml(asset.assetTypeLabel) + '</strong><small>' + (pending ? '后台安全检查中' : escapeHtml(sku)) + '</small></div>' +
                 '<div class="workflow-node-actions"><button type="button" data-node-edit aria-label="编辑图片" title="' + (pending ? '安全检查通过后可编辑' : '编辑图片') + '"' + (pending ? ' disabled' : '') + '><i data-lucide="sliders-horizontal"></i></button><button type="button" data-node-remove aria-label="移出画布" title="移出画布"><i data-lucide="x"></i></button></div>' +
@@ -330,7 +345,7 @@
                     var fallback = target.getAttribute('data-fallback');
                     if (fallback && target.getAttribute('data-fallback-used') !== '1') {
                         target.setAttribute('data-fallback-used', '1');
-                        target.src = fallback;
+                        target.src = safeImageUrl(fallback);
                     }
                 });
             });
@@ -362,7 +377,7 @@
             if (sourceNodeInput) {
                 sourceNodeInput.value = uuidByNodeId[Number(nodeId)] || '';
             }
-            image.src = asset.fileUrl;
+            image.src = safeImageUrl(asset.fileUrl);
             image.setAttribute('data-fallback', asset.backupFileUrl || '');
             image.removeAttribute('data-fallback-used');
             image.alt = asset.assetTypeLabel;
@@ -638,7 +653,7 @@
                         var keepCurrentSelection = Number(selectedAssetId) === Number(completed.sourceAssetId) && jobId === latestJobId;
                         addResultAsset(job.asset, completed.sourceAssetId, keepCurrentSelection);
                         if (keepCurrentSelection) {
-                            resultImage.src = job.imageUrl;
+                            resultImage.src = safeImageUrl(job.imageUrl);
                             resultImage.setAttribute('data-result-asset-id', String(job.assetId || ''));
                             resultMeta.textContent = '已输出 ' + job.outputWidth + '×' + job.outputHeight;
                             editResult.href = '#node-' + nodeByAssetId[Number(job.assetId)];
@@ -878,7 +893,7 @@
                 return;
             }
             previewScale = 1;
-            previewImage.src = asset.fileUrl;
+            previewImage.src = safeImageUrl(asset.fileUrl);
             previewImage.setAttribute('data-fallback', asset.backupFileUrl || '');
             previewImage.removeAttribute('data-fallback-used');
             previewImage.alt = asset.assetTypeLabel;
@@ -941,7 +956,7 @@
             button.setAttribute('data-workflow-asset-card', '');
             button.setAttribute('data-asset-id', String(asset.id));
             button.setAttribute('data-search-text', ((asset.skuCode || '') + ' ' + (asset.skuName || '') + ' ' + asset.assetTypeLabel).toLowerCase());
-            button.innerHTML = '<img src="' + escapeHtml(asset.fileUrl) + '" data-fallback="' + escapeHtml(asset.backupFileUrl || '') + '" alt="' + escapeHtml(asset.assetTypeLabel) + '"><span><strong>' + escapeHtml(asset.assetTypeLabel) + '</strong><small>' + (asset.status === 'pending' ? '后台安全检查中' : escapeHtml((asset.skuCode || '未归类') + ' · ' + (asset.skuName || '素材'))) + '</small></span><i data-lucide="plus"></i>';
+            button.innerHTML = '<img src="' + escapeHtml(safeImageUrl(asset.fileUrl)) + '" data-fallback="' + escapeHtml(safeImageUrl(asset.backupFileUrl || '')) + '" alt="' + escapeHtml(asset.assetTypeLabel) + '"><span><strong>' + escapeHtml(asset.assetTypeLabel) + '</strong><small>' + (asset.status === 'pending' ? '后台安全检查中' : escapeHtml((asset.skuCode || '未归类') + ' · ' + (asset.skuName || '素材'))) + '</small></span><i data-lucide="plus"></i>';
             list.prepend(button);
             bindAssetCard(button);
             setupImageFallbacks(button);
@@ -1343,7 +1358,7 @@
             var fallback = image.getAttribute('data-fallback');
             if (fallback && image.getAttribute('data-fallback-used') !== '1') {
                 image.setAttribute('data-fallback-used', '1');
-                image.src = fallback;
+                image.src = safeImageUrl(fallback);
             }
         });
         shell.querySelector('[data-canvas-preview]').addEventListener('click', function () { openPreview(assetsById[selectedAssetId]); });
@@ -1454,7 +1469,7 @@
             var fallback = previewImage.getAttribute('data-fallback');
             if (fallback && previewImage.getAttribute('data-fallback-used') !== '1') {
                 previewImage.setAttribute('data-fallback-used', '1');
-                previewImage.src = fallback;
+                previewImage.src = safeImageUrl(fallback);
             }
         });
         previewImage.addEventListener('load', preparePreview);

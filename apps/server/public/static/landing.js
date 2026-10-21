@@ -1,6 +1,21 @@
 (function () {
     'use strict';
 
+    function safeImageUrl(value) {
+        var text = String(value || '').trim();
+        if (!text) return '';
+        try {
+            var url = new URL(text, window.location.href);
+            if (url.protocol === 'http:' || url.protocol === 'https:') return url.href;
+            // Local previews stay images; these URLs must never be reused as navigation links.
+            if (url.protocol === 'blob:' && url.origin === window.location.origin) return url.href;
+            if (/^data:image\/[a-z0-9.+-]+(?:;[^,]*)?,/i.test(text)) return url.href;
+        } catch (error) {
+            // Invalid image locations are left empty rather than interpreted as another URL type.
+        }
+        return '';
+    }
+
     var DRAFT_KEY = 'asset-factory-product-launch-v1';
     var MAX_REFERENCES = 6;
     var MAX_REFERENCE_BYTES = 24 * 1024 * 1024;
@@ -120,7 +135,7 @@
                 var image = document.createElement('img');
                 var url = URL.createObjectURL(file);
                 previewUrls.push(url);
-                image.src = url;
+                image.src = safeImageUrl(url);
                 image.alt = '商品图片 ' + (index + 1);
 
                 var label = document.createElement('span');

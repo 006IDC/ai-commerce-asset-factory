@@ -1,14 +1,70 @@
 from __future__ import annotations
 
 import json
+import os
+from pathlib import Path
+import tempfile
 import threading
 import unittest
+from unittest.mock import patch
 import urllib.error
 import urllib.request
 from http.server import ThreadingHTTPServer
 from typing import Any
 
 import app
+
+
+class RuntimeCredentialTest(unittest.TestCase):
+    values = {name: "synthetic-value-" + name.lower() for name in app.BRIDGE_SECRET_NAMES}
+
+    def test_existing_process_environment_remains_supported(self):
+        with patch.dict(os.environ, self.values, clear=True):
+            self.assertEqual(app.bridge_credentials(), self.values)
+
+    def test_private_runtime_credential_precedes_environment(self):
+        with tempfile.TemporaryDirectory() as directory:
+            credential = Path(directory) / "ark-bridge-secrets"
+            credential.write_text(json.dumps(self.values))
+            credential.chmod(0o400)
+            with patch.dict(os.environ, {"CREDENTIALS_DIRECTORY": directory}, clear=True):
+                self.assertEqual(app.bridge_credentials(), self.values)
+                with patch.object(app, "StsTokenManager") as tokens:
+                    bridge = app.ArkBridge()
+                    self.assertEqual(bridge.internal_key, self.values["ARK_BRIDGE_API_KEY"])
+                    tokens.assert_called_once_with(
+                        self.values["VOLC_ACCESSKEY"], self.values["VOLC_SECRETKEY"], "cn-beijing"
+                    )
+
+    def test_invalid_credential_never_falls_back_or_leaks_content(self):
+        for content in ["synthetic-private-invalid-json", "{}", "[]", '"synthetic-private"', "x" * 65537]:
+            with self.subTest(content_length=len(content)), tempfile.TemporaryDirectory() as directory:
+                credential = Path(directory) / "ark-bridge-secrets"
+                credential.write_text(content)
+                credential.chmod(0o400)
+                with patch.dict(os.environ, {**self.values, "CREDENTIALS_DIRECTORY": directory}, clear=True):
+                    with self.assertRaisesRegex(RuntimeError, "missing, invalid or not private") as caught:
+                        app.bridge_credentials()
+                    self.assertNotIn("synthetic-private", str(caught.exception))
+
+    def test_shared_readable_file_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            credential = Path(directory) / "ark-bridge-secrets"
+            credential.write_text(json.dumps(self.values))
+            credential.chmod(0o644)
+            with patch.dict(os.environ, {"CREDENTIALS_DIRECTORY": directory}, clear=True):
+                with self.assertRaises(RuntimeError):
+                    app.bridge_credentials()
+
+    def test_credential_symlink_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            actual = Path(directory) / "actual"
+            actual.write_text(json.dumps(self.values))
+            actual.chmod(0o400)
+            (Path(directory) / "ark-bridge-secrets").symlink_to(actual)
+            with patch.dict(os.environ, {"CREDENTIALS_DIRECTORY": directory}, clear=True):
+                with self.assertRaises(RuntimeError):
+                    app.bridge_credentials()
 
 
 class FakeBridge:
