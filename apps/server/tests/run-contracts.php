@@ -5,6 +5,7 @@ declare(strict_types=1);
 $root = dirname(__DIR__);
 $requestedTests = array_slice($argv, 1);
 $tests = $requestedTests !== [] ? $requestedTests : [
+    'dependency_compatibility.php',
     'security_regressions.php',
     'remote_media_url_guard.php',
     'visible_copy_contracts.php',
